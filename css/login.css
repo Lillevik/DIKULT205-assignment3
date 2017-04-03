@@ -1,0 +1,92 @@
+html{
+    min-height:100vh;
+    background-color: #f5f6fa;
+}
+
+text, p, label, span, input, a{
+    font-size: 12px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+input{
+    -webkit-appearance: none;
+    -moz-appearance:none;
+    appearance:none;
+}
+
+#loginform{
+    width: 300px;
+    margin: 20vh auto 0;
+    max-width: 100%;
+    border: 1px solid silver;
+    border-radius:2px;
+    padding-bottom:15px;
+    -webkit-box-shadow: 0px 0px 30px -4px rgba(153,133,153,1);
+    -moz-box-shadow: 0px 0px 30px -4px rgba(153,133,153,1);
+    box-shadow: 0px 0px 30px -4px rgba(153,133,153,1);
+    background-color:#f8f9fd;
+    overflow: auto;
+}
+
+.writteninput{
+    width:270px;
+    display: block;
+    margin: 0 auto;
+    padding:5px;
+    max-width: 100%;
+    border: 1px solid grey;
+    border-radius:2px;
+    -webkit-box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.75);
+    box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.75);
+}
+
+
+/* Styles the input labels */
+.inputlabel{
+    width:270px;
+    display: block;
+    margin: 10px auto 0;
+    font-size: 12px;
+    max-width: 100%;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+input[type='submit']{
+    display: block;
+    float:right;
+    margin-right:15px;
+    margin-top:10px;
+    padding:5px;
+    background-color:#b5f8ff;
+    border:1px solid silver;
+    cursor:pointer;
+}
+
+label[for='submit']{
+    display: block;
+    float: left;
+    margin-left:15px;
+    margin-top:10px;
+    padding:5px;
+}
+
+#wronginfo{
+    color:red;
+    width: 270px;
+    max-width: 100%;
+    margin:0 auto;
+    overflow: auto;
+}
+
+#info{
+    width: 270px;
+    max-width: 100%;
+    margin:0 auto;
+    color:#88c5e0;
+    overflow: auto;
+}
+
+#backtofrontpage{
+
+}

@@ -1,0 +1,15 @@
+#preview-image{
+    max-height: 200px;
+    max-width: 100%;
+    display: block;
+    margin: 20px auto;
+
+}
+
+form{
+    width: 400px;
+    max-width: 95%;
+    margin: 10vh auto 0;
+    border: 1px solid silver;
+    border-radius:2px;
+}

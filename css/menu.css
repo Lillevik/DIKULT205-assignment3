@@ -1,0 +1,89 @@
+body{
+    margin:0;
+    padding: 40px 0 0;
+}
+
+header{
+    width: 100vw;
+    background-color:#333;
+    position:fixed;
+    top:0;
+}
+
+nav{
+    background-color:#333;;
+    width:900px;
+    max-width: 100%;
+    margin:auto;
+}
+
+text, p, label, span, input, li, a, time, h1, h2, h3{
+    font-size: 12px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+.menulist{
+    padding:0;
+    margin:0;
+}
+
+.menuitem{
+    float: left;
+    list-style: none;
+    margin:0;
+    text-decoration:none;
+}
+
+.rightmenuitem{
+    float: right;
+    list-style: none;
+    margin:0;
+    text-decoration:none;
+}
+
+
+.droplist{
+    display: none;
+    position: fixed;
+    top:38px;
+    right:0;
+}
+
+#dropdown:hover + #droplist{
+    display: block;
+}
+
+.dropitem{
+    list-style: none;
+    margin:0;
+    background-color: grey;
+    text-decoration: none;
+}
+
+.menulink:hover{
+    background-color:rgba(119, 120, 124, .80);
+    color:white;
+    text-decoration:none;
+}
+
+
+.menulink{
+    text-align: center;
+    text-decoration: none;
+    padding: 5px;
+    margin: 5px;
+    border-radius: 10px;
+    display:inline-block;
+    color: white;
+}
+
+.user-img{
+    width: 100px;
+    height: 100px;
+    float: left;
+}
+
+.inner-img{
+    max-height: 100%;
+    max-width: 100%;
+}

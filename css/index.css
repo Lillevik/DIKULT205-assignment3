@@ -1,0 +1,129 @@
+main{
+    margin: 0 auto;
+    width: 1100px;
+    display: flex;
+    justify-content: center;
+    max-width: 100%;
+}
+
+#post-container{
+    padding:5px;
+    display: inline-block;
+}
+
+#right-container{
+    padding:5px;
+    width: 300px;
+    display: inline-block;
+    top:0;
+}
+
+.right-section{
+    margin: 0 10px 10px;
+    border: 1px solid silver;
+    border-radius: 2px;
+    -webkit-box-shadow: 0px 0px 30px -4px rgba(153,133,153,1);
+    -moz-box-shadow: 0px 0px 30px -4px rgba(153,133,153,1);
+    box-shadow: 0px 0px 30px -4px rgba(153,133,153,1);
+    padding:20px;
+    min-height: 200px;
+}
+
+.right-list-item{
+    list-style: none;
+}
+
+.right-list{
+    padding: 0;
+}
+
+.post-image{
+    max-width: 100%;
+    display: block;
+    margin: 0 auto;
+}
+
+.post-wrapper{
+    width: 500px;
+    padding:10px;
+    border: 1px solid silver;
+    border-radius:2px;
+    -webkit-box-shadow: 0px 0px 30px -4px rgba(153,133,153,1);
+    -moz-box-shadow: 0px 0px 30px -4px rgba(153,133,153,1);
+    box-shadow: 0px 0px 30px -4px rgba(153,133,153,1);
+    background-color:#f8f9fd;
+    margin: 0 auto 20px;
+    max-width: 95%;
+}
+
+.details{
+    width: 450px;
+    display: block;
+    margin: 0 auto;
+    max-width: 90%;
+}
+
+.post-title{
+    font-size: 20px;
+    width: 450px;
+    display: block;
+    margin:0 auto;
+    max-width: 90%;
+}
+
+.like-button{
+    height: 10px;
+    margin-right:10px;
+    cursor:pointer;
+}
+
+.edit-icon{
+    height: 10px;
+    cursor:pointer;
+    float: right;
+    margin:14px;
+}
+
+.date{
+    display: block;
+}
+
+.likes{
+    display: inline-block;
+}
+
+.post-username{
+    float: right;
+}
+
+#likes-window{
+    background-color:#333;
+    display: none;
+    position: absolute;
+    border: 1px solid silver;
+    border-radius: 2px;
+    padding: 0;
+}
+
+.like-name{
+    color: #f5f6fa;
+    list-style: none;
+}
+
+@media (max-width: 750px){
+    main{
+        display: block;
+    }
+
+    #post-container{
+        width: 100%;
+    }
+
+    #right-container{
+        width: 100%;
+    }
+
+    .post-wrapper{
+        width: 100%;
+    }
+}

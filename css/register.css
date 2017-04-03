@@ -1,0 +1,130 @@
+html{
+    min-height:100vh;
+    background-color: #f5f6fa;
+}
+
+text, p, label, span, input, a{
+    font-size: 12px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+ul{
+    width:270px;
+    max-width: 100%;
+    padding: 0;
+    margin: 10px auto 0;
+}
+li{
+    display: inline-block;
+    width: 32%;
+}
+
+/* Styles the register form */
+#registerform{
+    width: 300px;
+    max-width: 100%;
+    border: 1px solid silver;
+    border-radius:2px;
+    padding-bottom:15px;
+    -webkit-box-shadow: 0px 0px 30px -4px rgba(153,133,153,1);
+    -moz-box-shadow: 0px 0px 30px -4px rgba(153,133,153,1);
+    box-shadow: 0px 0px 30px -4px rgba(153,133,153,1);
+    background-color:#f8f9fd;
+    padding-top:10px;
+    margin: 50px auto 50px;
+}
+
+
+/* Resets default appearances */
+
+input[type='submit']{
+    -webkit-appearance: none;
+    -moz-appearance:none;
+    appearance:none;
+}
+
+/* Styles all written inputs */
+.writteninput{
+    width:270px;
+    display: block;
+    padding:5px;
+    border: 2px solid grey;
+    border-radius:2px;
+    margin: 0 auto 10px;
+    max-width: 90%;
+    -webkit-box-shadow: inset 0px 0px 2px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: inset 0px 0px 2px 0px rgba(0,0,0,0.75);
+    box-shadow: inset 0px 0px 2px 0px rgba(0,0,0,0.75);
+}
+
+.writteninput:focus{
+    outline: none;
+}
+
+
+/* Styles the input labels */
+.inputlabel{
+    width:270px;
+    display: block;
+    margin: 10px auto 0;
+    font-size: 12px;
+    max-width: 100%;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+.genderlabel{
+    display: inline-block;
+    padding:0;
+    margin:0;
+    width:100%;
+}
+
+label[for='terms']{
+    display: block;
+    width: 270px;
+    max-width: 100%;
+    margin: 10px auto 0;
+}
+
+/* Styles the submit button */
+input[type="submit"]{
+    margin-top:12px;
+    padding:5px;
+    background-color:#b5f8ff;
+    cursor:pointer;
+}
+
+.required{
+    color:#fa5c6a;
+    width:270px;
+    max-width: 100%;
+    margin: 10px auto;
+}
+
+.requiredInfo{
+    border-color: #fa5c6a;
+}
+
+#errormessage{
+    color:#fa5c6a;
+    width:270px;
+    max-width: 100%;
+    margin: 10px auto;
+}
+
+.info{
+    width:270px;
+    display: block;
+    margin: 10px auto 0;
+    font-size: 12px;
+    max-width: 100%;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+.error-message{
+    display: block;
+    width: 90%;
+    color:#fa5c6a;
+    margin: 0 auto;
+}
+
