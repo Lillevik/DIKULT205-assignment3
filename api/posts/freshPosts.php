@@ -6,7 +6,7 @@
  * Time: 10:15
  */
 
-include '../../../dbHandling.php';
+include '../../dbHandling.php';
 header('Content-Type: application/json');
 try{
     get_fresh_posts(10);

@@ -21,7 +21,7 @@ function like_post(element) {
 
         //Localhost
         var host_url = domain + "/api/posts/";
-
+        
         //Starts the working process
         working = true;
 
@@ -35,7 +35,7 @@ function like_post(element) {
             $.ajax({
                 type: "POST",
                 data: {data:id},
-                url: host_url + "add_like.php",
+                url: host_url + "add_like",
                 success: function(data){
                     working = false;
                     if(data == 'Success'){
@@ -51,7 +51,7 @@ function like_post(element) {
             $.ajax({
                 type: "POST",
                 data: {data:id},
-                url: host_url + "delete_like.php",
+                url: host_url + "delete_like",
                 success: function(data){
                     working = false;
                     if(data == 'Success'){

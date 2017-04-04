@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET'){
     session_start();
     header('Content-Type: application/json');
     $post_id = $_GET['post'];
-    require '../../../dbHandling.php';
+    require '../../dbHandling.php';
     get_post_likes($post_id);
 }else{
     echo 'Method not allowed';

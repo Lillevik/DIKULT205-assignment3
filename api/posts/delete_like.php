@@ -8,7 +8,7 @@
 if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     session_start();
     if(isset($_SESSION['logged_in'])){
-        require '../../../dbHandling.php';
+        require '../../dbHandling.php';
         $post_id = $_POST['data'];
         delete_like($post_id, $_SESSION['id']);
         echo 'Success';
