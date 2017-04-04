@@ -389,15 +389,15 @@ function insert_recovery_token($email){
     $user_id = null;
     $user_email = null;
     $user_username = null;
-    if($stmt1->fetch()){
+    while($stmt1->fetch()){
         $user_id = $id;
         $user_email = $email;
         $user_username = $username;
 
+
         $stmt = $conn->prepare('INSERT INTO password_reset (email, token, expiration_date) VALUES (?, ?, ?);');
         $stmt->bind_param('sss', $email, $token, $date);
         $stmt->execute();
-        $stmt->close();
     }
 
     var_dump($conn->error);
