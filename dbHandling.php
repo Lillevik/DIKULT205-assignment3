@@ -379,8 +379,8 @@ function insert_recovery_token($email){
 
     /* Prevent sqlinjection using prepared statement */
 
-    $stmt1 = $conn->prepare('SELECT id, email, username FROM USERS WHERE email = ? limit 1;');
-    //var_dump($conn->error);
+    $stmt1 = $conn->prepare('SELECT id, email, username FROM users WHERE email = ? limit 1;');
+
 
 
     $stmt1->store_result();
@@ -400,6 +400,7 @@ function insert_recovery_token($email){
         $stmt->close();
     }
 
+    var_dump($conn->error);
     mail($user_email,'Password reset',
         '<DOCTYPE html>
         <html>
