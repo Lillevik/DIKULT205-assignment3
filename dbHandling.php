@@ -85,8 +85,8 @@ function user_exists($username_to_check, $email_to_check){
 
     $conn = get_conn();
 
-    $smnt = $conn->prepare('SELECT username, email FROM users WHERE username = "mariusfalch@hotmail.com" or email = "mariusfalch@hotmail.com";');
-    //$smnt->bind_param('ss', $username_to_check, $email_to_check);
+    $smnt = $conn->prepare('SELECT username, email FROM users WHERE username = ? or email = ?;');
+    $smnt->bind_param('ss', $username_to_check, $email_to_check);
 
     $smnt->execute();
     $smnt->store_result();
@@ -374,49 +374,98 @@ function check_account_information($email){
 function insert_recovery_token($email){
     $conn = get_conn();
     $dateString = strtotime("+1 day");
-    $date = date('M d, Y', $dateString);
+    $date = date("Y-m-d H:i:s", $dateString);
     $token = random_string(50);
 
     /* Prevent sqlinjection using prepared statement */
-
-    $stmt1 = $conn->prepare('SELECT id, email, username FROM users WHERE email = ? limit 1;');
-
-
-
+    $stmt1 = $conn->prepare('SELECT email, username FROM users WHERE email = ? limit 1;');
+    $stmt1->bind_param('s', $email);
+    $stmt1->execute();
     $stmt1->store_result();
-    $stmt1->bind_result($id, $email, $username);
+    $stmt1->bind_result($dbemail, $username);
 
-    $user_id = null;
-    $user_email = null;
-    $user_username = null;
-    while($stmt1->fetch()){
-        $user_id = $id;
-        $user_email = $email;
-        $user_username = $username;
+    if($stmt1->fetch()){
+        $unique = false;
+
+        while(!$unique){
+            if(!token_exists($token, $conn)){
+                //Add reset token
+                $stmt = $conn->prepare('INSERT INTO password_reset (email, token, expiration_date) VALUES (?, ?, ?);');
+                $stmt->bind_param('sss', $email, $token, $date);
+                $stmt->execute();
+
+                //Setup the email.
+                $topic = "Password reset";
+                $message =
+                '<DOCTYPE html>
+                <html>
+                    <head>
+                        <meta charset="utf-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    </head>
+                    <body>
+                        <main style="border:1px solid #333; border-radius: 2px; background:lightcyan;width: 500px; max-width: 100%; margin:0 auto; padding:20px;">
+                            <p>Hello, ' . $username . '.</p>
+                            <p>Here is a <a href="https://dikult205.k.uib.no/NSJ17/assignment3/forgotPassword.php?token='.$token.'">link</a> to <b>reset</b> your password.</p>
+                        </main>
+                    </body>
+                </html>';
+                $header = "Content-Type: text/html; charset=UTF-8\r\n";
+
+                mail($dbemail,$topic,$message,$header);
+                $stmt->close();
 
 
-        $stmt = $conn->prepare('INSERT INTO password_reset (email, token, expiration_date) VALUES (?, ?, ?);');
-        $stmt->bind_param('sss', $email, $token, $date);
-        $stmt->execute();
+                $unique = true;
+            }
+        }
     }
 
-    var_dump($conn->error);
-    mail($user_email,'Password reset',
-        '<DOCTYPE html>
-        <html>
-            <body>Hello, ' . $user_username . '. Here is a <a href="https://dikult205.k.uib.no/NSJ17/assignment3/forgotPassword.php?token='.$token.'">link</a> to <b>reset</b> your email.</body>
-        </html>'
-        ,"Content-Type: text/html; charset=UTF-8\r\n");
-
-    /* Execute prepared statement */
-
     $conn->commit();
-
-
     /* Close db connection and statement*/
-
     $stmt1->close();
     $conn->close();
+}
+
+function token_exists($token, $conn = null){
+    if(!isset($conn)){
+        $conn = get_conn();
+    }
+    $smnt = $conn->prepare('SELECT token FROM password_reset where token = ? limit 1;');
+    $smnt->bind_param('s', $token);
+
+    $smnt->execute();
+    $smnt->store_result();
+    $smnt->bind_result($token);
+
+    if($smnt->fetch()) {
+        return true;
+    }else{
+        return false;
+    }
+}
+
+function reset_password($newPass, $token){
+    $conn = get_conn();
+    $smnt = $conn->prepare('SELECT email, token FROM password_reset WHERE token = ? limit 1');
+    $smnt->bind_param('s', $token);
+
+    $smnt->execute();
+
+    $smnt->store_result();
+    $smnt->bind_result($email, $token);
+    if($smnt->fetch()){
+        $pwhash = password_hash($newPass, PASSWORD_BCRYPT);
+        $smnt = $conn->prepare('UPDATE users SET password_hash = ? WHERE email = ?;');
+        $smnt->bind_param('ss', $pwhash, $email);
+        $smnt->execute();
+
+        $smnt = $conn->prepare('DELETE FROM password_reset WHERE token = ?');
+        $smnt->bind_param('s', $token);
+        $smnt->execute();
+
+        $smnt->close();
+    }
 }
 
 

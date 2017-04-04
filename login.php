@@ -42,6 +42,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                 echo (isset($_GET['logout']) ? '<p id="info">Successfully logged out</p>' : null);
                 echo (isset($_GET['access']) ? '<p id="wronginfo">You need to login first.</p>' : null);
             ?>
+            <p><a href="./forgotPassword.php">Forgot password?</a></p>
         </form>
     </main>
 </body>
