@@ -35,7 +35,7 @@ function like_post(element) {
             $.ajax({
                 type: "POST",
                 data: {data:id},
-                url: host_url + "add_like",
+                url: host_url + "add_like.php",
                 success: function(data){
                     working = false;
                     if(data == 'Success'){
@@ -51,7 +51,7 @@ function like_post(element) {
             $.ajax({
                 type: "POST",
                 data: {data:id},
-                url: host_url + "delete_like",
+                url: host_url + "delete_like.php",
                 success: function(data){
                     working = false;
                     if(data == 'Success'){
