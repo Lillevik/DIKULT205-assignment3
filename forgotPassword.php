@@ -10,12 +10,7 @@ include 'dbHandling.php';
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $email = (isset($_POST['email']) ? $_POST['email']:'');
-    mail($email,'Hello, ' . 'username',
-        '<DOCTYPE html>
-        <html>
-            <body>Here is a <a href="localhost:8888/forgotPassword.php?token=abcd12345">link</a> to <b>reset</b> your email.</body>
-        </html>'
-        ,"Content-Type: text/html; charset=UTF-8\r\n");
+    insert_recovery_token($email);
 }
 ?>
 
