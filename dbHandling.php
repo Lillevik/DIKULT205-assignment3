@@ -353,6 +353,46 @@ function get_fresh_posts(){
     echo indent($json);
 }
 
+function check_account_information($email){
+    $conn = get_conn();
+
+    $stmt = $conn->prepare('SELECT id, email, username FROM USERS WHERE email = ? limit 1;');
+    $stmt->bind_param('s', $email);
+
+    $stmt->store_result();
+    $stmt->bind_result($id, $email, $username);
+
+    $arr = Array();
+    while($stmt->fetch()){
+        $arr['id'] = $id;
+        $arr['email'] = $email;
+        $arr['username'] = $username;
+    }
+    return $arr;
+}
+
+function insert_recovery_token($email, $username){
+    $conn = get_conn();
+    $dateString = strtotime("+1 day");
+    $date = date('M d, Y', $dateString);
+    $token = random_string(50);
+
+    /* Prevent sqlinjection using prepared statement */
+    $stmt = $conn->prepare('INSERT INTO password_reset (email, token, expiration_date) VALUES (?, ?, ?);');
+    //var_dump($conn->error);
+    $stmt->bind_param('sss', $email, $token, $date);
+
+
+    /* Execute prepared statement */
+    $stmt->execute();
+    $conn->commit();
+
+
+    /* Close db connection and statement*/
+    $stmt->close();
+    $conn->close();
+}
+
 
 
 
