@@ -21,7 +21,7 @@ function like_post(element) {
 
         //Localhost
         var host_url = domain + "/api/posts/";
-        
+
         //Starts the working process
         working = true;
 

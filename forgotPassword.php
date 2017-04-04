@@ -39,6 +39,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="./css/menu.css">
+        <link rel="stylesheet" href="./css/passwordReset.css">
     </head>
     <body>
         <header>
@@ -47,21 +48,23 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <?php
         if(!isset($_GET['token'])){
             echo '
-            <form action="./forgotPassword.php?forgot=true" method="post">
-                <label for="emailField">Email-address</label><br>
-                <input type="text" id="emailField" name="email" placeholder="someone@example.com"><br>
-                <input type="submit">
-                '. (isset($_GET['success']) ? '<p>If the email is in our system, we have sent a link to reset it.</p>' : '') . '
-                '. (isset($_GET['invalidToken']) ? '<p>This token is expired or invalid.</p>' : '' ). '
-                '. (isset($_GET['resetSuccess']) ? '<p>Password was successfully changed!</p>' : '' ). '
+            <form action="./forgotPassword.php?forgot=true" method="post" class="password-form">
+                <label for="emailField" class="inputlabel">Email-address</label>
+                <input type="text" id="emailField" class="input-field" name="email" placeholder="someone@example.com">
+                <input type="submit" value="Send" class="submit-button">
+                '. (isset($_GET['success']) ? '<p class="infoMessage">If the email is in our system, we have sent a link to reset it.</p>' : '') . '
+                '. (isset($_GET['invalidToken']) ? '<p class="infoMessage">This token is expired or invalid.</p>' : '' ). '
+                '. (isset($_GET['resetSuccess']) ? '<p class="infoMessage">Password was successfully changed!</p>' : '' ). '
             </form>';
         }else{
             echo
-            '<form action="./forgotPassword.php?token='.$_GET['token'].'" method="post">
-                <input type="password" placeholder="New password" name="password">
-                <input type="password" placeholder="Repeat password" name="repeatpassword">
-                '. (isset($_GET['resetSuccess']) ? '<p>Passwords are not matching!</p>' : '' ). '
-                <input type="submit">
+            '<form action="./forgotPassword.php?token='.$_GET['token'].'" method="post" class="password-form">
+                <label for="password" class="inputlabel">Password</label>
+                <input type="password" id="password" placeholder="New password" name="password" class="input-field">
+                <label for="repeatpassword" class="inputlabel">Repeat password</label>
+                <input type="password" id="repeatpassword" placeholder="Repeat password" name="repeatpassword" class="input-field">
+                '. (isset($_GET['resetSuccess']) ? '<p class="infoMessage">Passwords are not matching!</p>' : '' ). '
+                <input type="submit" value="Reset" class="submit-button">
             </form>';
         }
 

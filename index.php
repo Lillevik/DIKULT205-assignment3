@@ -22,11 +22,11 @@ include_once 'functions.php';
         <link rel="stylesheet" href="css/index.css">
         <script src="https://use.fontawesome.com/db87107c26.js"></script>
         <script type="text/javascript" src="./js/jquery.js"></script>
-        <script type="text/javascript" src="./js/config.js"></script>
+        <script type="text/javascript" src="./config.js"></script>
         <script type="text/javascript" src="./js/likes.js"></script>
 
-
         <script>
+            /*
             function start_gif(element){
                 var src = element.getAttribute("src");
                 console.log(src);
@@ -36,7 +36,7 @@ include_once 'functions.php';
                 var new_src = current_src.substring(0, current_src.length - 1) + "." + arr[1];
                 console.log(new_src);
                 element.setAttribute("src", './uploadsfolder/' + new_src);
-            }
+            }*/
         </script>
     </head>
 
