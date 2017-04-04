@@ -2,6 +2,7 @@
  * Created by goat on 18/01/17.
  */
 
+
 //Variable for the like process
 var working = false;
 
@@ -16,13 +17,10 @@ function like_post(element) {
 
     //Check if another process is already running
     if(!working){
-        //School server
-        //var host_url = "https://dikult205.k.uib.no/NSJ17/assignment3/api/posts/";
+
 
         //Localhost
-        var host_url = "http://localhost:8888/api/posts/";
-
-        //var host_url = "http://localhost/api/posts/";
+        var host_url = domain + "/api/posts/";
 
         //Starts the working process
         working = true;

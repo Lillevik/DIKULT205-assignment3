@@ -22,6 +22,7 @@ include_once 'functions.php';
         <link rel="stylesheet" href="css/index.css">
         <script src="https://use.fontawesome.com/db87107c26.js"></script>
         <script type="text/javascript" src="./js/jquery.js"></script>
+        <script type="text/javascript" src="./config.js"></script>
         <script type="text/javascript" src="./js/likes.js"></script>
 
 
