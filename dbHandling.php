@@ -36,17 +36,37 @@ class Post{
     var $description;
     var $likes;
     var $added;
-    var $filename;
+    var $extension;
+    var $post_key;
     var $user_id;
 
-    function __construct($id, $title, $description, $likes, $added, $filename, $user_id) {
+    function __construct($id, $title, $description, $likes, $added, $extension, $post_key, $user_id) {
         $this->id = $id;
         $this->title = $title;
         $this->description = $description;
         $this->likes = $likes;
         $this->added = $added;
-        $this->filename = $filename;
+        $this->extension = $extension;
+        $this->post_key = $post_key;
         $this->user_id = $user_id;
+    }
+}
+
+class Comment{
+    var $id;
+    var $text;
+    var $user_id;
+    var $time;
+    var $parent_id;
+    var $post_key;
+
+    function __construct($id, $text, $user_id, $time, $parent_id, $post_key){
+        $this->id = $id;
+        $this->text = $text;
+        $this->user_id = $user_id;
+        $this->time = $time;
+        $this->parent_id = $parent_id;
+        $this->post_key = $post_key;
     }
 }
 
@@ -134,9 +154,13 @@ function insert_new_image($title, $description, $filename, $userid){
     $conn = get_conn();
     $now = date("Y-m-d H:i:s");
 
+    $name_arr = explode('.', $filename);
+    $post_key = $name_arr[0];
+    $extension = "." . $name_arr[1];
+
     /* Prevent sqlinjection */
-    $stmt = $conn->prepare('INSERT INTO posts (title, description, added, filename, user_id) VALUES (?, ?, ?, ?, ?);');
-    $stmt->bind_param('ssssi', $title, $description, $now, $filename, $userid);
+    $stmt = $conn->prepare('INSERT INTO posts (title, description, added, extension, post_key, user_id) VALUES (?, ?, ?, ?, ?, ?);');
+    $stmt->bind_param('sssssi', $title, $description, $now, $extension, $post_key, $userid);
 
     /* Execute prepared statement */
     $stmt->execute();
@@ -156,7 +180,7 @@ function echo_posts($limit){
     $logged_in_user_id = (isset($_SESSION['id']) ? $_SESSION['id'] : '');
 
     //
-    $smnt = $conn->prepare('SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.filename, users.username, users.id, likes.user_id
+    $smnt = $conn->prepare('SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, users.id, likes.user_id
                             FROM posts
                             JOIN users ON (posts.user_id = users.id ) 
                             LEFT JOIN likes ON (likes.user_id = ? AND posts.id = likes.post_id)
@@ -165,16 +189,17 @@ function echo_posts($limit){
     $smnt->execute();
 
     $smnt->store_result();
-    $smnt->bind_result($id, $title, $description, $likes, $added, $filename, $username, $user_id, $liked_id);
+    $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $user_id, $liked_id);
 
     $liked = "liked.png";
     $not_liked = "like.png";
     while($smnt->fetch()) {
-        $arr = explode("." , $filename);
-        $cropped_image = $arr[0] . 'c.' . $arr[1];
+        $cropped_image = $post_key . 'c' . $extension;
         echo '<section class="post-wrapper">
                     <h1 class="post-title">'. $title .'</h1>
+                    <a href="./post.php?key='.$post_key.'">
                     <img class="post-image" src="./uploadsfolder/' . $cropped_image . '" onclick="start_gif(this)">' .
+                    '</a>' .
                     '<section class="details">
                             <p class="post-description">' .$description . '</p><hr>' .
                            '<time class="date">Added:'. date("d/m/Y", strtotime($added)).'</time>' .
@@ -183,6 +208,27 @@ function echo_posts($limit){
                     '</section>'  .
               '</section>';
     }
+}
+
+function get_personal_posts(){
+    $conn = get_conn();
+
+    $id = $_SESSION['id'];
+
+    $smnt = $conn->prepare('SELECT * FROM posts WHERE user_id = ?');
+    $smnt->bind_param('i', $id);
+
+    $smnt->execute();
+
+    $smnt->store_result();
+    $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $user_id);
+
+    $post_arr = Array();
+    while($smnt->fetch()){
+        $post = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id);
+        array_push($post_arr, $post);
+    }
+    return $post_arr;
 }
 
 function insert_like($post_id, $user_id){
@@ -233,15 +279,21 @@ function delete_like($post_id, $user_id){
 }
 
 
-function get_post_info($post_id){
+function get_post_info($post_id_or_key){
     $conn = get_conn();
+    $queryParam = null;
+    if(gettype($post_id_or_key) == "integer" || gettype(intval($post_id_or_key)) == "integer"){
+        $queryParam = 'id';
+    }else if(gettype($post_id_or_key) == 'string'){
+        $queryParam = 'post_key';
+    }
 
-    $smnt = $conn->prepare('SELECT * FROM posts WHERE id = ?;');
-    $smnt->bind_param('i', $post_id);
+    $smnt = $conn->prepare('SELECT * FROM posts WHERE '.$queryParam.' = ? limit 1;');
+    $smnt->bind_param('i', $post_id_or_key);
     $smnt->execute();
 
     $smnt->store_result();
-    $smnt->bind_result($id, $title, $description, $likes, $added, $filename, $user_id);
+    $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $user_id);
 
     $post_array = Array();
     if($smnt->fetch()) {
@@ -250,13 +302,16 @@ function get_post_info($post_id){
         $post_array['description'] = $description;
         $post_array['likes'] = $likes;
         $post_array['added'] = $added;
-        $post_array['filename'] = $filename;
+        $post_array['post_key'] = $post_key;
+        $post_array['extension'] = $extension;
         $post_array['user_id'] = $user_id;
         return $post_array;
     }else{
         return false;
     }
 }
+
+
 
 function delete_post($post_id){
     $conn = get_conn();
@@ -465,6 +520,101 @@ function reset_password($newPass, $token){
         $smnt->execute();
 
         $smnt->close();
+    }
+}
+
+function get_posts_before_and_after($post_key){
+    $conn = get_conn();
+    $post_arr = Array();
+
+
+    $smnt = $conn->prepare('SELECT * FROM posts where post_key = ? limit 1;');
+    $smnt->bind_param('s', $post_key);
+    $smnt->execute();
+
+    $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $user_id);
+
+
+
+
+
+    if($smnt->fetch()) {
+        $currentId = $id;
+        $post_arr['current'] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id);
+        $smnt->close();
+
+        //Fetch the post before
+        if($smnt1 = $conn->prepare('SELECT post_key FROM posts where id < ? order by id desc limit 1;')) {
+
+            $smnt1->bind_param('i', $currentId);
+            $smnt1->store_result();
+            $smnt1->execute();
+            $smnt1->bind_result($post_key);
+
+            if ($smnt1->fetch()) {
+                $post_arr['previous'] = $post_key;
+            }else{
+                $post_arr['previous'] = 'Empty';
+            }
+        }
+
+
+        $smnt1->close();
+
+        //Fetch the post after
+        if($smnt2 = $conn->prepare('SELECT post_key FROM posts where id > ? order by id asc limit 1;')){
+            $smnt2->bind_param('i', $currentId);
+            $smnt2->execute();
+            $smnt2->store_result();
+            $smnt2->bind_result($post_key);
+
+            if($smnt2->fetch()){
+                $post_arr['next'] = $post_key;
+            }else{
+                $post_arr['next'] = 'Empty';
+            }
+        }
+
+        $smnt2->close();
+        $conn->close();
+        return $post_arr;
+    }
+}
+
+function insert_comment($post_key, $comment){
+    $conn = get_conn();
+    $now = date("Y-m-d H:i:s");
+    $user_id = $_SESSION['id'];
+    if($smnt = $conn->prepare('INSERT INTO comments (text, user_id, time, post_key) VALUES (?,?,?,?);')){
+        $smnt->bind_param('siss', $comment, $user_id, $now, $post_key);
+        if($smnt->execute()){
+            return true;
+        }else{
+            var_dump($conn->error);
+            return false;
+        }
+    }else{
+        var_dump($conn->error);
+        return false;
+    }
+}
+
+function get_post_comments($post_key){
+    $conn = get_conn();
+    if($smnt = $conn->prepare('SELECT * FROM comments WHERE post_key = ? ORDER BY id DESC')){
+        $smnt->bind_param('s', $post_key);
+        $smnt->execute();
+
+        $smnt->store_result();
+        $smnt->bind_result($id, $text, $user_id, $time, $parent_id, $post_key);
+
+        $comment_arr = Array();
+        while($smnt->fetch()){
+            array_push($comment_arr, new Comment($id, $text, $user_id, $time, $parent_id, $post_key));
+        }
+        return $comment_arr;
+    }else{
+        return false;
     }
 }
 

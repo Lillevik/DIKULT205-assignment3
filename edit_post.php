@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         $id = $post_array['id'];
         $title = $post_array['title'];
         $description = $post_array['description'];
-        $filename = $post_array['filename'];
+        $filename = $post_array['post_key'] . $post_array['extension'];
         $user_id = $post_array['user_id'];
 
         if($_SESSION['id'] != $user_id){
@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 <html>
     <head>
         <link rel="stylesheet" href="css/menu.css">
-        <link rel="stylesheet" href="css/post.css">
+        <link rel="stylesheet" href="css/newpost.css">
         <script type="text/javascript" src="js/jquery.js"></script>
         <script src="http://cloud.tinymce.com/stable/tinymce.min.js?apiKey=vnl5crhqxbrkolf8f9f8yce1ni48ud128eyl9624aw0r22n9"></script>
         <script>tinymce.init({ selector:'#description' });</script>
