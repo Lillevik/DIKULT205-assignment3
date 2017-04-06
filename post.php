@@ -47,29 +47,12 @@ $url = $post->post_key . $post->extension;
 
         <section id="post-wrapper">
             <h1 class="post-title"><?php echo $post->title?></h1>
+            <p>
+                <?php echo ($previousKey != 'Empty' ? "<a id='previous' href='./post.php?key=$previousKey'><- prev</a>":'')?>
+                <?php echo ($nextKey != 'Empty' ? "<a id='next' href='./post.php?key=$nextKey'>next -></a>":'')?>
+            </p>
             <div id="img-wrapper">
-                <div class="arrow-wrapper left-arrow">
-                    <?php if($previousKey != 'Empty'){
-                        echo "<a href='./post.php?key=$previousKey'>
-                                  <i class='fa fa-arrow-left arrow' aria-hidden=\"true\"></i>
-                              </a>";
-                    }
-                    ?>
-                </div>
-                <div id="img-element-wrapper">
-                    <img id="post-image" src="./uploadsfolder/<?php echo $url?>">
-                </div>
-
-
-                <div class="arrow-wrapper right-arrow">
-                        <?php if($nextKey != 'Empty'){
-                        echo "<a href='./post.php?key=$nextKey'>
-                                  <i class='fa fa-arrow-right arrow' aria-hidden=\"true\"></i>
-                              </a>";
-                        }
-                        ?>
-                    </a>
-                </div>
+                <img id="post-image" src="./uploadsfolder/<?php echo $url?>">
             </div>
             <section id="description">
                 <?php echo $post->description?>
