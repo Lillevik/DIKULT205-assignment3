@@ -56,8 +56,10 @@ $url = $post->post_key . $post->extension;
                     }
                     ?>
                 </div>
+                <div id="img-element-wrapper">
+                    <img id="post-image" src="./uploadsfolder/<?php echo $url?>">
+                </div>
 
-                <img id="post-image" src="./uploadsfolder/<?php echo $url?>">
 
                 <div class="arrow-wrapper right-arrow">
                         <?php if($nextKey != 'Empty'){

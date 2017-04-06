@@ -50,11 +50,18 @@ main{
     border-radius: 5px;
 }
 
-#post-image{
-    display: block;
+#img-element-wrapper{
     max-height: 100%;
     max-width: 100%;
     width: calc(100% - 100px);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+#post-image{
+    max-height: 100%;
+    max-width: 100%;
 }
 
 .arrow{
