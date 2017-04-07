@@ -40,6 +40,8 @@ class Post{
     var $post_key;
     var $user_id;
 
+
+
     function __construct($id, $title, $description, $likes, $added, $extension, $post_key, $user_id) {
         $this->id = $id;
         $this->title = $title;
@@ -49,6 +51,7 @@ class Post{
         $this->extension = $extension;
         $this->post_key = $post_key;
         $this->user_id = $user_id;
+
     }
 }
 
@@ -59,14 +62,18 @@ class Comment{
     var $time;
     var $parent_id;
     var $post_key;
+    var $children;
+    var $username;
 
-    function __construct($id, $text, $user_id, $time, $parent_id, $post_key){
+    function __construct($id, $text, $user_id, $time, $parent_id, $post_key, $username = 'Anonymous'){
         $this->id = $id;
         $this->text = $text;
         $this->user_id = $user_id;
         $this->time = $time;
         $this->parent_id = $parent_id;
         $this->post_key = $post_key;
+        $this->children = Array();
+        $this->username = $username;
     }
 }
 
@@ -534,10 +541,6 @@ function get_posts_before_and_after($post_key){
 
     $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $user_id);
 
-
-
-
-
     if($smnt->fetch()) {
         $currentId = $id;
         $post_arr['current'] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id);
@@ -581,14 +584,18 @@ function get_posts_before_and_after($post_key){
     }
 }
 
-function insert_comment($post_key, $comment){
+function insert_comment($post_key, $comment, $parent_id){
     $conn = get_conn();
     $now = date("Y-m-d H:i:s");
     $user_id = $_SESSION['id'];
-    if($smnt = $conn->prepare('INSERT INTO comments (text, user_id, time, post_key) VALUES (?,?,?,?);')){
-        $smnt->bind_param('siss', $comment, $user_id, $now, $post_key);
+    $username = $_SESSION['username'];
+    $parsed_parent_id = intval($parent_id);
+    if($smnt = $conn->prepare('INSERT INTO comments (text, user_id, time, parent_id, post_key) VALUES (?,?,?,?, ?);')){
+        $smnt->bind_param('sisis', $comment, $user_id, $now, $parent_id, $post_key);
         if($smnt->execute()){
-            return true;
+            $insertedId = $smnt->insert_id;
+
+            return [true, new Comment($insertedId,$comment, $user_id, $now, $parsed_parent_id, $post_key, $username)];
         }else{
             var_dump($conn->error);
             return false;
@@ -601,17 +608,34 @@ function insert_comment($post_key, $comment){
 
 function get_post_comments($post_key){
     $conn = get_conn();
-    if($smnt = $conn->prepare('SELECT * FROM comments WHERE post_key = ? ORDER BY id DESC')){
+    if($smnt = $conn->prepare('SELECT comments.id, comments.text, comments.user_id, comments.time, comments.parent_id, comments.post_key, users.username
+                               FROM comments  
+                               JOIN users ON (users.id = comments.user_id)
+                               WHERE comments.post_key = ? 
+                               ORDER BY comments.id DESC;')){
         $smnt->bind_param('s', $post_key);
         $smnt->execute();
 
         $smnt->store_result();
-        $smnt->bind_result($id, $text, $user_id, $time, $parent_id, $post_key);
+        $smnt->bind_result($id, $text, $user_id, $time, $parent_id, $post_key, $username);
 
         $comment_arr = Array();
         while($smnt->fetch()){
-            array_push($comment_arr, new Comment($id, $text, $user_id, $time, $parent_id, $post_key));
+            $comment_arr[$id] = new Comment($id, $text, $user_id, $time, $parent_id, $post_key, $username);
         }
+
+        foreach ($comment_arr as $com) {
+            if ($com->parent_id != 0) {
+                $comment_arr[$com->parent_id]->children[] = $com;
+            }
+        }
+
+        foreach ($comment_arr as $com) {
+            if ($com->parent_id != 0) {
+                unset($comment_arr[$com->id]);
+            }
+        }
+
         return $comment_arr;
     }else{
         return false;

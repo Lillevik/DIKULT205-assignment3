@@ -2,6 +2,10 @@
  * This file handles...
  */
 
+var currentShown = null;
+const params = get_url_parameters();
+var working = false;
+
 
 function get_url_parameters() {
     result = {};
@@ -23,38 +27,147 @@ function get_url_parameters() {
 }
 
 
+function show_input(id){
+    if(currentShown != null){
+        currentShown.remove();
+    }
+    var parent = document.getElementById(id);
+
+    var listElem = document.createElement('li');
+    var field = document.createElement('textarea');
+
+    listElem.appendChild(field);
+    parent.appendChild(listElem);
+
+    //The new currentShown container
+    currentShown = field;
+
+    //Add event listener for the enter key
+    currentShown.addEventListener('keyup',function(){
+        var key = window.event.keyCode;
+        if(key === 13){
+            add_comment(this.value, this.parentNode.parentNode, this, params.key);
+            this.value = '';
+        }
+    });
+}
+
+
 window.onload = function(){
-    const params = get_url_parameters();
-    var working = false;
+
+
     const form = document.getElementById('comment-form');
     const commentList = document.getElementById('comments-list');
     form.addEventListener('submit', function(e){
         e.preventDefault();
 
-        var commentText = document.getElementById('comment-field').value;
-        if(!working){
-            working = true;
-            $.ajax({
-                type: "POST",
-                data: {commentField:commentText, key:params.key},
-                url: host_url + "comment",
-                success: function(data){
-                    working = false;
-                    if(data == '1'){
-                        var commentElement = document.createElement('li');
-                        commentElement.innerHTML = commentText;
-                        commentList.prepend(commentElement);
-                    }else if(data == '2'){
-                        alert('You need to login to comment on posts.');
-                    }
-                    console.log(data)
-                },
-                error:function(data){
-                    console.log(data);
-                }});
-        }
+        var commentText = document.getElementById('comment-field');
+        add_comment(commentText.value, 0, 0, params.key);
 
-    })
+    });
+
+    var commentElements = document.querySelectorAll('.reply-button');
+    for(var i = 0; i<commentElements.length;i++){
+        commentElements[i].addEventListener('click', function(){
+            show_input(this.parentNode.getAttribute('id'));
+        })
+    }
+
+
 };
+
+
+
+function add_comment(text, parent_element, field, p_key){
+    console.log(parent_element);
+    var root = true;
+    var parent_id = null;
+    var newParentElement;
+
+    if(parent_element == 0){
+        parent_id = 0;
+        parent_element = document.getElementById('comments-list');
+    }else{
+        parent_id = parseInt(parent_element.getAttribute('id'));
+        newParentElement = field.parentNode.parentNode.nextSibling.childNodes[1];
+        root = false;
+    }
+
+    $.ajax({
+        type: "POST",
+        data: {commentField:text, parent_id:parent_id, post_key:p_key},
+        url: host_url + "comment",
+        success: function(data){
+            if(data.comment){
+                var comment = data.comment;
+                var commentElement = document.createElement('LI');
+                commentElement.setAttribute('id', comment.id);
+                commentElement.classList.add('comment');
+
+                var profileInfo = document.createElement('div');
+                profileInfo.classList.add('profile-info');
+
+                var img = new Image();
+                img.classList.add('profile-pic');
+                img.src = './images/profile.png';
+
+                var profileLink = document.createElement('a');
+                profileLink.innerHTML = comment.username;
+                profileLink.classList.add('profile-link');
+                profileLink.href = '#';
+
+                var commentText = document.createElement('p');
+                commentText.classList.add('comment-text');
+                commentText.innerHTML = comment.text;
+
+                var replyButton = document.createElement('input');
+                replyButton.classList.add('reply-button');
+                replyButton.setAttribute('value', 'reply');
+                replyButton.setAttribute('type', 'button');
+
+                replyButton.addEventListener('click', function(){
+                    show_input(this.parentNode.getAttribute('id'));
+                });
+
+                profileInfo.appendChild(img);
+                profileInfo.appendChild(profileLink);
+
+                commentElement.appendChild(profileInfo);
+                commentElement.appendChild(commentText);
+                commentElement.appendChild(replyButton);
+
+                if(root){
+                    parent_element.prepend(commentElement);
+                }else{
+                    var sibling = field.parentNode.parentNode.nextSibling;
+                    var selfParent = field.parentNode.parentNode;
+                    if(sibling.nodeName != 'DETAILS'){
+                        var details = document.createElement('details');
+                        var summary = document.createElement('summary');
+                        summary.innerHTML = '<span class="number-of-replies">1</span> replies';
+
+                        var listContainer = document.createElement('ul');
+                        listContainer.classList.add('comment-parent-list');
+                        listContainer.appendChild(commentElement);
+
+                        details.appendChild(summary);
+                        details.appendChild(listContainer);
+
+                        $(details).insertAfter(selfParent);
+                    }else{
+                        newParentElement.prepend(commentElement);
+                    }
+                }
+
+            }else if(data == '2'){
+                alert('You need to login to comment on posts.');
+            }
+        },
+        error:function(data){
+            console.log(data);
+            console.log(data.responseText)
+        }});
+}
+
 
 

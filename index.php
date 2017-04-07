@@ -15,9 +15,10 @@ include_once 'functions.php';
 <html>
 
     <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" href="images/.jpg">
+        <?php
+            echo_metadata();
+        ?>
+        <title>Picstr</title>
         <link rel="stylesheet" href="css/menu.css">
         <link rel="stylesheet" href="css/index.css">
         <script src="https://use.fontawesome.com/db87107c26.js"></script>

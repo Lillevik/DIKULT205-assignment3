@@ -5,6 +5,14 @@
  * Date: 14/01/17
  * Time: 16:16
  */
+
+function echo_metadata(){
+    echo
+    "<meta charset=\"utf-8\">
+     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+     <link rel=\"icon\" href=\"./images/logo.svg\">";
+}
+
 function get_navigation(){
 
     $username = (isset($_SESSION['username']) ? $_SESSION['username'] : null);
@@ -106,6 +114,20 @@ function indent($json) {
     }
 
     return $result;
+}
+
+function echo_comment_tree($comments){
+    foreach($comments as $com){
+        echo "<li class='comment' id='$com->id'><div class='profile-info'><img src='./images/profile.png' class='profile-pic'><a class='profile-link' href='#'>$com->username</a></div> <p class='comment-text'>$com->text</p><input type='button' value='reply' class='reply-button'></li>";
+        if(count($com->children)){
+            echo "<details>";
+            echo "<summary>".count($com->children)." replies </summary>";
+            echo "<ul class='comment-parent-list' id='parent_$com->id'>";
+            echo_comment_tree($com->children);
+            echo "</ul>";
+            echo "</details>";
+        }
+    }
 }
 
 ?>

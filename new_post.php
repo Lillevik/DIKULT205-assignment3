@@ -70,7 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     //Resize file
     $resize_ok = null;
     try{
-        $resize_ok = resize_image($_FILES["file-upload"]["tmp_name"], $target_dir, $cropped_name);
+        $resize_ok = resize_image_to_400($_FILES["file-upload"]["tmp_name"], $target_dir, $cropped_name);
+        resize_image_width($_FILES["file-upload"]["tmp_name"], $target_dir, $filestring . "800." . $imageFileType, 800);
     }catch (Exception $e){
         array_push($err_arr, "<p class='error-message'>Sorry, there was an error handling the file.</p>");
     }
@@ -123,8 +124,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
                 if(isset($err_arr)){
                     foreach($err_arr as $msg){
                         echo $msg;
+                    }
                 }
-                }?>
+                ?>
                 <label for="title" class="inputlabel">Title</label><input type="text" id="title" name="title" placeholder="Title">
                 <img id="preview" src="#" alt="Your image is displayed here" title="Your image">
                 <label for="description" class="inputlabel">Description</label><textarea id="description" name="description" placeholder="Description..."></textarea>
@@ -171,9 +173,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
                 });
             </script>
         </main>
-
-        <footer>
-
-        </footer>
     </body>
 </html>

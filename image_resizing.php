@@ -8,7 +8,7 @@
 
 include 'simpleImage.php';
 
-function resize_image($temp, $target_dir, $cropped_name){
+function resize_image_to_400($temp, $target_dir, $cropped_name){
     $image = new SimpleImage();
     $image->load($temp);
     $width = $image->getWidth();
@@ -24,6 +24,17 @@ function resize_image($temp, $target_dir, $cropped_name){
     }
     else if($width < 300 OR $height < 200){
         return [false, "<p class='error-message'>Image must be larger than 300px in width and 200px in height. Your image is " .$image->getWidth()."px x " . $image->getHeight()."px.</p>"];
+    }
+}
+
+function resize_image_width($temp, $target_dir, $resized_name, $maxWidth){
+    $image = new SimpleImage();
+    $image->load($temp);
+    $width = $image->getWidth();
+    if($width > $maxWidth){
+        $image->resizeToWidth($maxWidth);
+        $image->save($target_dir . $resized_name);
+        return [true];
     }
 }
 

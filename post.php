@@ -32,7 +32,7 @@ $url = $post->post_key . $post->extension;
     <meta charset="utf-8">
     <link rel="stylesheet" href="./css/singlePost.css">
     <link rel="stylesheet" href="./css/menu.css">
-    <script src="https://use.fontawesome.com/db87107c26.js"></script>
+    <!--<script src="https://use.fontawesome.com/db87107c26.js"></script>-->
     <script src="./js/jquery.js"></script>
     <script src="./config.js"></script>
     <script src="./js/post.js"></script>
@@ -65,13 +65,9 @@ $url = $post->post_key . $post->extension;
             <ul id="comments-list">
                 <?php
                     if($comments){
-                        foreach($comments as $comment){
-                            echo '<li class="comment">'.$comment->text.'</li>';
-                        }
+                        echo_comment_tree($comments);
                     }
-
                 ?>
-
             </ul>
         </section>
 
