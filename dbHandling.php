@@ -64,8 +64,9 @@ class Comment{
     var $post_key;
     var $children;
     var $username;
+    var $avatar;
 
-    function __construct($id, $text, $user_id, $time, $parent_id, $post_key, $username = 'Anonymous'){
+    function __construct($id, $text, $user_id, $time, $parent_id, $post_key, $username = 'Anonymous', $avatar = null){
         $this->id = $id;
         $this->text = $text;
         $this->user_id = $user_id;
@@ -74,6 +75,21 @@ class Comment{
         $this->post_key = $post_key;
         $this->children = Array();
         $this->username = $username;
+        $this->avatar = $avatar;
+    }
+}
+
+class Avatar{
+    var $id;
+    var $key;
+    var $extension;
+    var $user_id;
+
+    function __construct($id, $key, $extension, $user_id){
+        $this->id = $id;
+        $this->key = $key;
+        $this->extension = $extension;
+        $this->user_id = $user_id;
     }
 }
 
@@ -134,12 +150,12 @@ function user_exists($username_to_check, $email_to_check){
 function validate_login($username_or_email, $password){
     $conn = get_conn();
 
-    $smnt = $conn->prepare('SELECT id, email, username, password_hash FROM users WHERE username = ? or email = ?');
+    $smnt = $conn->prepare('SELECT id, email, username, password_hash, avatar FROM users WHERE username = ? or email = ?');
     $smnt->bind_param('ss', $username_or_email, $username_or_email);
     $smnt->execute();
 
     $smnt->store_result();
-    $smnt->bind_result($id, $email, $username, $hash);
+    $smnt->bind_result($id, $email, $username, $hash, $avatar);
 
     if($smnt->fetch()) {
         if(password_verify($password, $hash)){
@@ -148,6 +164,7 @@ function validate_login($username_or_email, $password){
             $_SESSION['username'] = $username;
             $_SESSION['email'] = $email;
             $_SESSION['id'] = $id;
+            $_SESSION['avatar'] = $avatar;
             return true;
         }else{
             return false;
@@ -289,14 +306,17 @@ function delete_like($post_id, $user_id){
 function get_post_info($post_id_or_key){
     $conn = get_conn();
     $queryParam = null;
-    if(gettype($post_id_or_key) == "integer" || gettype(intval($post_id_or_key)) == "integer"){
+    $bindParam = null;
+    if(intval($post_id_or_key) != 0){
         $queryParam = 'id';
+        $bindParam = 'i';
     }else if(gettype($post_id_or_key) == 'string'){
         $queryParam = 'post_key';
+        $bindParam = 's';
     }
 
     $smnt = $conn->prepare('SELECT * FROM posts WHERE '.$queryParam.' = ? limit 1;');
-    $smnt->bind_param('i', $post_id_or_key);
+    $smnt->bind_param($bindParam, $post_id_or_key);
     $smnt->execute();
 
     $smnt->store_result();
@@ -320,11 +340,18 @@ function get_post_info($post_id_or_key){
 
 
 
-function delete_post($post_id){
+function delete_post($post_id_or_key){
     $conn = get_conn();
 
+    $queryParam = null;
+    if(gettype($post_id_or_key) == "integer" || gettype(intval($post_id_or_key)) == "integer"){
+        $queryParam = 'id';
+    }else if(gettype($post_id_or_key) == 'string'){
+        $queryParam = 'post_key';
+    }
+
     /* Prevent sqlinjection */
-    $stmt = $conn->prepare('DELETE FROM posts WHERE id = ?;');
+    $stmt = $conn->prepare('DELETE FROM posts WHERE '.$queryParam.' = ?;');
     $stmt->bind_param('i', $post_id);
 
     /* Execute prepared statement */
@@ -337,12 +364,19 @@ function delete_post($post_id){
     $conn->close();
 }
 
-function update_post($title, $description, $post_id){
+function update_post($title, $description, $post_id_or_key){
     $conn = get_conn();
 
+    $queryParam = null;
+    if(gettype($post_id_or_key) == "integer" || gettype(intval($post_id_or_key)) == "integer"){
+        $queryParam = 'id';
+    }else if(gettype($post_id_or_key) == 'string'){
+        $queryParam = 'post_key';
+    }
+
     /* Prevent sqlinjection */
-    $stmt = $conn->prepare('UPDATE posts SET title = ?, description = ? WHERE id = ?;');
-    $stmt->bind_param('ssi', $title, $description, $post_id);
+    $stmt = $conn->prepare('UPDATE posts SET title = ?, description = ? WHERE '.$queryParam.' = ?;');
+    $stmt->bind_param('ssi', $title, $description, $post_id_or_key);
 
     /* Execute prepared statement */
     $stmt->execute();
@@ -608,7 +642,7 @@ function insert_comment($post_key, $comment, $parent_id){
 
 function get_post_comments($post_key){
     $conn = get_conn();
-    if($smnt = $conn->prepare('SELECT comments.id, comments.text, comments.user_id, comments.time, comments.parent_id, comments.post_key, users.username
+    if($smnt = $conn->prepare('SELECT comments.id, comments.text, comments.user_id, comments.time, comments.parent_id, comments.post_key, users.username, users.avatar
                                FROM comments  
                                JOIN users ON (users.id = comments.user_id)
                                WHERE comments.post_key = ? 
@@ -617,11 +651,11 @@ function get_post_comments($post_key){
         $smnt->execute();
 
         $smnt->store_result();
-        $smnt->bind_result($id, $text, $user_id, $time, $parent_id, $post_key, $username);
+        $smnt->bind_result($id, $text, $user_id, $time, $parent_id, $post_key, $username, $avatar);
 
         $comment_arr = Array();
         while($smnt->fetch()){
-            $comment_arr[$id] = new Comment($id, $text, $user_id, $time, $parent_id, $post_key, $username);
+            $comment_arr[$id] = new Comment($id, $text, $user_id, $time, $parent_id, $post_key, $username, $avatar);
         }
 
         foreach ($comment_arr as $com) {
@@ -643,6 +677,76 @@ function get_post_comments($post_key){
 }
 
 
+function insert_new_avatar($avatar_key, $extension, $user_id){
+    $conn = get_conn();
 
+    /* Prevent sqlinjection */
+    if($stmt = $conn->prepare('INSERT INTO avatars (avatar_key, extension, user_id) VALUES (?, ?, ?);')){
+        $stmt->bind_param('ssi', $avatar_key,$extension, $user_id);
+
+        /* Execute prepared statement */
+        if($stmt->execute()){
+            $stmt->close();
+            $conn->close();
+            return true;
+        }else{
+            $stmt->close();
+            $conn->close();
+            return false;
+        }
+    }else{
+        return false;
+    }
+
+
+
+    /* Close db connection and statement*/
+}
+
+function get_user_avatars($user_id){
+    $conn = get_conn();
+
+    if($stmt = $conn->prepare('SELECT * FROM avatars WHERE user_id = ?;')) {
+        $stmt->bind_param('i', $user_id);
+
+        $stmt->store_result();
+        $stmt->bind_result($id,$avatar_key, $extension, $user_id);
+
+        $arr = Array();
+        if($stmt->execute()){
+            while($stmt->fetch()){
+                $arr[] = new Avatar($id, $avatar_key, $extension, $user_id);
+            }
+        }
+        return $arr;
+    }
+
+}
+
+
+function update_user_avatar($user_id, $avatar){
+    $conn = get_conn();
+
+    /* Prevent sqlinjection */
+    if($stmt = $conn->prepare('UPDATE users SET avatar = ? WHERE id = ?;')){
+        $stmt->bind_param('si', $avatar, $user_id);
+
+        /* Execute prepared statement */
+        if($stmt->execute()){
+            $stmt->close();
+            return true;
+        }else{
+            $stmt->close();
+            return false;
+        }
+    }else{
+        $stmt->close();
+        return false;
+    }
+
+
+
+
+}
 
 ?>

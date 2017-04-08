@@ -1,0 +1,63 @@
+#avatar-preview{
+    width: 80px;
+    height:80px;
+}
+
+main{
+    width: 800px;
+    max-width: 95%;
+    margin: auto;
+}
+
+#inputFile{
+    display: block;
+    width:100%;
+    margin-top:10px;
+    margin-bottom:10px;
+}
+
+label[for="inputFile"]{
+    display: block;
+    margin-top:10px;
+    margin-bottom:10px;
+}
+
+#wrapper{
+    display: block;
+    width: 100%;
+}
+
+label[for="userImage"]{
+    display: block;
+}
+
+label > input:checked + img{ /* (RADIO CHECKED) IMAGE STYLES */
+    border:2px solid #4DBAFF;
+    border-radius:2px;
+    width: 46px;
+    height:46px;
+}
+
+
+
+.recent-avatar{
+    width: 50px;
+    height:50px;
+}
+
+.recent-avatar-label{
+    width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 10px;
+    border: 1px solid #333;
+    border-radius:5px;
+    float: left;
+    margin: 5px;
+}
+
+#saveButton{
+    display: block;
+    width: 100%;
+}

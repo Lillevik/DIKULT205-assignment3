@@ -6,28 +6,29 @@
  * Time: 16:16
  */
 
+
 function echo_metadata(){
     echo
     "<meta charset=\"utf-8\">
-     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-     <link rel=\"icon\" href=\"./images/logo.svg\">";
+     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+     <link rel='icon' href='./images/logo.svg'>";
 }
 
 function get_navigation(){
-
+    $domain = get_domain();
     $username = (isset($_SESSION['username']) ? $_SESSION['username'] : null);
     echo
         "<nav>
             <ul class='menulist'>
-                <li class='menuitem'><a href='./' class='menulink'>Home</a></li>
-                <li class='menuitem'><a href='./new_post.php' class='menulink'>New post</a></li>"
+                <li class='menuitem'><a href='$domain/' class='menulink'>Home</a></li>
+                <li class='menuitem'><a href='$domain/new_post.php' class='menulink'>New post</a></li>"
                 . (isset($_SESSION['logged_in']) ?
 
-               "<li class='rightmenuitem'><a href='./logout.php' class='menulink'>Logout</a></li>
-                <li class='rightmenuitem'><a href='./profile.php' class='menulink'>$username</a></li>" :
+               "<li class='rightmenuitem'><a href='$domain/logout.php' class='menulink'>Logout</a></li>
+                <li class='rightmenuitem'><a href='$domain/profile.php' class='menulink'>$username</a></li>" :
 
-               "<li class='rightmenuitem'><a href='./login.php' class='menulink'>Login</a></li>" .
-               "<li class='rightmenuitem'><a href='./register.php' class='menulink'>Register</a></li>") .
+               "<li class='rightmenuitem'><a href='$domain/login.php' class='menulink'>Login</a></li>" .
+               "<li class='rightmenuitem'><a href='$domain/register.php' class='menulink'>Register</a></li>") .
            "</ul>
         </nav>";
 }
@@ -118,7 +119,8 @@ function indent($json) {
 
 function echo_comment_tree($comments){
     foreach($comments as $com){
-        echo "<li class='comment' id='$com->id'><div class='profile-info'><img src='./images/profile.png' class='profile-pic'><a class='profile-link' href='#'>$com->username</a></div> <p class='comment-text'>$com->text</p><input type='button' value='reply' class='reply-button'></li>";
+        $avatar = (isset($com->avatar) ? './avatars/' . $com->avatar: './images/profile.png');
+        echo "<li class='comment' id='$com->id'><div class='profile-info'><img src='$avatar' class='profile-pic'><a class='profile-link' href='#'>$com->username</a></div> <p class='comment-text'>$com->text</p><input type='button' value='reply' class='reply-button'></li>";
         if(count($com->children)){
             echo "<details>";
             echo "<summary>".count($com->children)." replies </summary>";

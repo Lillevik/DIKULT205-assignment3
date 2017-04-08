@@ -12,9 +12,9 @@ require_once 'functions.php';
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     session_start();
     check_user_logged_in();
-    $post_id = (isset($_GET['post']) ? $_GET['post'] : null);
-    $post_array = get_post_info($post_id);
-
+    $post_id_or_key = (isset($_GET['post']) ? $_GET['post'] : null);
+    $post_array = get_post_info($post_id_or_key);
+    $uploadSuccess = (isset($_GET['uploadSuccess']) ? true:false);
     if (!$post_array) {
         echo 'This post does not exist.';
         exit();
@@ -33,9 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 }else if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $title = $_POST['title'];
     $description = (isset($_POST['description']) ? $_POST['description'] : null);
-    $post_id = (isset($_GET['post']) ? $_GET['post'] : null);
-    update_post($title, $description, $post_id);
-    header('Location: edit_post.php?post=' . $post_id . "&success=true");
+    $post_id_or_key = (isset($_GET['post']) ? $_GET['post'] : null);
+    update_post($title, $description, $post_id_or_key);
+    header('Location: edit_post.php?post=' . $post_id_or_key . "&success=true");
     exit();
 }
 
@@ -61,6 +61,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
             <?php get_navigation(); ?>
         </header>
         <form action="edit_post.php?post=<?php echo $id ?>" method="POST" enctype="multipart/form-data">
+            <?php
+            if($uploadSuccess){
+                echo '<p>Post was successful.</p>';
+                echo '<p>Permalink: <a href="./post.php?key='.$post_array['post_key'].'">here</a></p>';
+            }
+            ?>
             <?php echo (isset($_GET['success']) ? "<p class='success-message'>Successfully updated the post.</p>" : null);?>
             <label for="title" class="inputlabel">Title</label><input type="text" id="title" name="title" placeholder="Title" value="<?php echo $title ?>">
             <img id="preview" src="./uploadsfolder/<?php echo $filename ?>" alt="Your image is displayed here" title="Your image">

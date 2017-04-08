@@ -27,11 +27,13 @@ function resize_image_to_400($temp, $target_dir, $cropped_name){
     }
 }
 
-function resize_image_width($temp, $target_dir, $resized_name, $maxWidth){
+function resize_image_width($temp, $target_dir, $resized_name, $maxWidth, $minWidth){
     $image = new SimpleImage();
     $image->load($temp);
     $width = $image->getWidth();
-    if($width > $maxWidth){
+    if($width < $minWidth){
+        return [false, "<p class='error-message'>Image must be larger than 80px in width and 80px in height. Your image is " .$image->getWidth()."px x " . $image->getHeight()."px.</p>"];
+    }else if($width > $maxWidth){
         $image->resizeToWidth($maxWidth);
         $image->save($target_dir . $resized_name);
         return [true];
