@@ -119,7 +119,7 @@ function indent($json) {
 
 function echo_comment_tree($comments){
     foreach($comments as $com){
-        $avatar = (isset($com->avatar) ? './avatars/' . $com->avatar: './images/profile.png');
+        $avatar = ($com->avatar != null ? './avatars/' . $com->avatar: './images/profile.png');
         echo "<li class='comment' id='$com->id'><div class='profile-info'><img src='$avatar' class='profile-pic'><a class='profile-link' href='#'>$com->username</a></div> <p class='comment-text'>$com->text</p><input type='button' value='reply' class='reply-button'></li>";
         if(count($com->children)){
             echo "<details>";
