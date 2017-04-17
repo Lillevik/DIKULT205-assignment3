@@ -1,5 +1,4 @@
 #avatar-preview{
-    width: 80px;
     height:80px;
 }
 
@@ -34,27 +33,33 @@ label[for="userImage"]{
 label > input:checked + img{ /* (RADIO CHECKED) IMAGE STYLES */
     border:2px solid #4DBAFF;
     border-radius:2px;
-    width: 46px;
     height:46px;
 }
 
 
 
 .recent-avatar{
-    width: 50px;
-    height:50px;
+    max-height: 100%;
 }
 
 .recent-avatar-label{
-    width: 100px;
+    float: left;
+    margin-top:15px;
+    margin-right:15px;
+    height:50px;
+    width: 50px;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: space-around;
-    padding: 10px;
-    border: 1px solid #333;
-    border-radius:5px;
-    float: left;
-    margin: 5px;
+}
+
+.recent-avatar-label:hover{
+    cursor: pointer;
+}
+
+.recentAva{
+    display: none;
 }
 
 #saveButton{

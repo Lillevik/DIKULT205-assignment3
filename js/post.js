@@ -46,6 +46,7 @@ function show_input(id){
     currentShown.addEventListener('keyup',function(){
         var key = window.event.keyCode;
         if(key === 13){
+            console.log(this.parentNode.parentNode)
             add_comment(this.value, this.parentNode.parentNode, this, params.key);
             this.value = '';
         }
@@ -55,9 +56,9 @@ function show_input(id){
 
 window.onload = function(){
 
-
     const form = document.getElementById('comment-form');
-    const commentList = document.getElementById('comments-list');
+    var favoIcon = document.getElementById('favourite-icon');
+
     form.addEventListener('submit', function(e){
         e.preventDefault();
 
@@ -72,14 +73,11 @@ window.onload = function(){
             show_input(this.parentNode.getAttribute('id'));
         })
     }
-
-
 };
 
 
 
 function add_comment(text, parent_element, field, p_key){
-    console.log(parent_element);
     var root = true;
     var parent_id = null;
     var newParentElement;
@@ -89,7 +87,13 @@ function add_comment(text, parent_element, field, p_key){
         parent_element = document.getElementById('comments-list');
     }else{
         parent_id = parseInt(parent_element.getAttribute('id'));
-        newParentElement = field.parentNode.parentNode.nextSibling.childNodes[1];
+
+        var siblings = field.parentNode.parentNode.parentNode.childNodes;
+        if(siblings.length <= 1){
+            newParentElement = field.parentNode.parentNode.parentNode;
+        }else{
+            newParentElement = field.parentNode.parentNode.nextSibling.childNodes[1];
+        }
         root = false;
     }
 
@@ -107,9 +111,18 @@ function add_comment(text, parent_element, field, p_key){
                 var profileInfo = document.createElement('div');
                 profileInfo.classList.add('profile-info');
 
+                var imgWrapper = document.createElement('div');
+                imgWrapper.classList.add('profile-pic-wrapper');
+
                 var img = new Image();
                 img.classList.add('profile-pic');
-                img.src = './images/profile.png';
+                console.log(comment.avatar);
+                if(comment.avatar != null){
+                    img.src = './avatars/' + comment.avatar;
+                }else{
+                    img.src = './images/profile.png';
+                }
+
 
                 var profileLink = document.createElement('a');
                 profileLink.innerHTML = comment.username;
@@ -129,8 +142,10 @@ function add_comment(text, parent_element, field, p_key){
                     show_input(this.parentNode.getAttribute('id'));
                 });
 
-                profileInfo.appendChild(img);
+                imgWrapper.appendChild(img)
+                profileInfo.appendChild(imgWrapper);
                 profileInfo.appendChild(profileLink);
+
 
                 commentElement.appendChild(profileInfo);
                 commentElement.appendChild(commentText);
@@ -140,11 +155,12 @@ function add_comment(text, parent_element, field, p_key){
                     parent_element.prepend(commentElement);
                 }else{
                     var sibling = field.parentNode.parentNode.nextSibling;
+                    console.log(sibling)
                     var selfParent = field.parentNode.parentNode;
-                    if(sibling.nodeName != 'DETAILS'){
+                    if(sibling == null || sibling.nodeName != 'DETAILS'){
                         var details = document.createElement('details');
                         var summary = document.createElement('summary');
-                        summary.innerHTML = '<span class="number-of-replies">1</span> replies';
+                        summary.innerHTML = '<span class="children-count">1</span> replies';
 
                         var listContainer = document.createElement('ul');
                         listContainer.classList.add('comment-parent-list');
@@ -155,6 +171,10 @@ function add_comment(text, parent_element, field, p_key){
 
                         $(details).insertAfter(selfParent);
                     }else{
+                        console.log(sibling.childNodes[0].childNodes[0]);
+                        var count = sibling.childNodes[0].childNodes[0];
+                        count.innerHTML = parseInt(count.innerHTML) + 1;
+
                         newParentElement.prepend(commentElement);
                     }
                 }
@@ -164,10 +184,10 @@ function add_comment(text, parent_element, field, p_key){
             }
         },
         error:function(data){
-            console.log(data);
             console.log(data.responseText)
         }});
 }
+
 
 
 

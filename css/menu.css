@@ -20,7 +20,7 @@ nav{
     margin:auto;
 }
 
-text, p, label, span, input, li, a, time, h1, h2, h3{
+text, p, label, span, input, li, a, time, h1, h2, h3, summary{
     font-size: 12px;
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 }

@@ -29,9 +29,9 @@ function like_post(element) {
         var id = element.getAttribute("id");
 
         //The current like count
-        var likesCount = $('.' + id);
+        var likesCount = $('#likes_count_' + id);
 
-        if (element.getAttribute("src") == './images/like.png'){
+        if (element.classList.contains('fa-heart-o')){
             $.ajax({
                 type: "POST",
                 data: {data:id},
@@ -40,7 +40,8 @@ function like_post(element) {
                     working = false;
                     if(data == 'Success'){
                         likesCount.text(parseInt(likesCount.text()) +1);
-                        element.setAttribute('src', './images/liked.png');
+                        element.classList.remove('fa-heart-o');
+                        element.classList.add('fa-heart');
                     }else if(data == 'Access denied'){
                         alert('You need to login to like posts.')
                     }
@@ -56,7 +57,12 @@ function like_post(element) {
                     working = false;
                     if(data == 'Success'){
                         likesCount.text(parseInt(likesCount.text()) - 1);
-                        element.setAttribute('src', './images/like.png');
+                        element.classList.remove('fa-heart');
+                        element.classList.add('fa-heart-o');
+                        element.classList.add('shadow');
+                        setTimeout(function(){
+                            element.classList.remove('shadow');
+                        }, 200)
                     }else if(data == 'Access denied'){
                         alert('You need to login to like posts.')
                     }
@@ -65,7 +71,6 @@ function like_post(element) {
             });
         }
     }
-
 }
 
 

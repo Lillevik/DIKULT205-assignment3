@@ -44,13 +44,6 @@ form{
     padding:10px;
 }
 
-#file{
-    width: 90%;
-    display: block;
-    margin: 10px auto;
-    padding:10px;
-    z-index: 9;
-}
 
 input[type="file"] {
     display: none;
@@ -59,10 +52,18 @@ input[type="file"] {
 label[for="file-upload"] {
     border: 1px solid silver;
     border-radius: 2px;
-    float: left;
     padding: 6px 12px;
     cursor: pointer;
     margin-top:20px;
+    display: block;
+}
+
+#file-label-contents{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 130px;
+    max-width: 100%;
 }
 
 .inputlabel{
@@ -80,7 +81,7 @@ label[for="file-upload"] {
 }
 
 #upload-icon{
-    width: 15px;
+    height: 20px;
 }
 
 input[type="submit"]{
@@ -120,4 +121,25 @@ input[type="submit"]{
     margin: 20px auto 0;
 }
 
+
+
+#tags-summary{
+    outline: none;
+}
+
+.tag-label{
+    border:1px solid #333;
+    border-radius: 2px;
+    padding:5px;
+    margin:5px;
+    float: left;
+}
+
+input[type=checkbox]{
+    display: none;
+} 
+
+input[type=checkbox]:checked + label {
+  background:green;
+} 
 

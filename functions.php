@@ -120,10 +120,10 @@ function indent($json) {
 function echo_comment_tree($comments){
     foreach($comments as $com){
         $avatar = ($com->avatar != null ? './avatars/' . $com->avatar: './images/profile.png');
-        echo "<li class='comment' id='$com->id'><div class='profile-info'><img src='$avatar' class='profile-pic'><a class='profile-link' href='#'>$com->username</a></div> <p class='comment-text'>$com->text</p><input type='button' value='reply' class='reply-button'></li>";
+        echo "<li class='comment' id='$com->id'><div class='profile-info'><div class='profile-pic-wrapper'><img src='$avatar' class='profile-pic'></div><a class='profile-link' href='#'>$com->username</a></div> <p class='comment-text'>$com->text</p><input type='button' value='reply' class='reply-button'></li>";
         if(count($com->children)){
             echo "<details>";
-            echo "<summary>".count($com->children)." replies </summary>";
+            echo "<summary><span class='children-count'>".count($com->children)."</span> replies </summary>";
             echo "<ul class='comment-parent-list' id='parent_$com->id'>";
             echo_comment_tree($com->children);
             echo "</ul>";

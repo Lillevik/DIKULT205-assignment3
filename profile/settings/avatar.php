@@ -80,11 +80,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
         } else {
 
             if (move_uploaded_file($_FILES["inputFile"]["tmp_name"], $target_dir . $filename)) {
-                $avatarImage = $filestring . "." . $imageFileType;
+                $avatarImage = $filestring . "80." . $imageFileType;
                 insert_new_avatar($filestring, "." . $imageFileType, $user_id);
                 update_user_avatar($user_id, $avatarImage);
                 $_SESSION['avatar'] = $avatarImage;
-                $newAvatarAdded = true;
+                $infoMsg = 'Your uploaded avatar was added and selected';
             } else {
                 array_push($err_arr, "<p class='error-message'>Sorry, there was an error uploading your file.</p>");
             }
@@ -92,9 +92,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     }else if(isset($_POST['radioImage'])){
         update_user_avatar($user_id, $_POST['radioImage']);
         $_SESSION['avatar'] = $_POST['radioImage'];
+        $infoMsg = 'Your selected avatar was updated.';
     }else if(isset($_POST['removeAvatar'])){
         update_user_avatar($user_id, null);
         $_SESSION['avatar'] = null;
+        $infoMsg = "Your avatar was removed.";
     }
 }
 
@@ -114,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
             <h1>Profile</h1>
             <section>
                 <h3>Select avatar</h3>
-
+                <h4><?php echo (isset($infoMsg)? $infoMsg : null)?></h4>
                 <img src="<?php echo ($_SESSION['avatar'] != null ? '../../avatars/' . $_SESSION['avatar'] : '../../images/profile.png')?>" id="avatar-preview">
                 <form action="./avatar.php" method="post" id="choose-avatar-form" enctype="multipart/form-data">
                     <label for="inputFile">Jpg, png or gif files</label>
@@ -126,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
                             $filename = $ava->key . "80" . $ava->extension;
                             echo
                             "<label class='recent-avatar-label'>
-                                <input type='radio' name='radioImage' value='$filename'>
+                                <input type='radio' name='radioImage' class='recentAva' value='$filename'>
                                 <img src='../../avatars/$filename' class='recent-avatar'>
                              </label>";
                         }

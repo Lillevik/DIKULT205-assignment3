@@ -14,7 +14,7 @@ $posts = get_posts_before_and_after($_GET['key']);
 $post = $posts['current'];
 
 //An array of comments
-$comments = get_post_comments($post->post_key);
+$comments = get_post_comments($post['post_key']);
 
 //A key to the previous post
 $previousKey = $posts['previous'];
@@ -23,20 +23,24 @@ $previousKey = $posts['previous'];
 $nextKey = $posts['next'];
 
 //An image url
-$url = $post->post_key . $post->extension;
+$url = $post['post_key'] . $post['extension'];
 
 ?>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
+    <link href="https://use.fontawesome.com/db87107c26.css" media="all" rel="stylesheet">
     <link rel="stylesheet" href="./css/singlePost.css">
     <link rel="stylesheet" href="./css/menu.css">
-    <!--<script src="https://use.fontawesome.com/db87107c26.js"></script>-->
+
+
     <script src="./js/jquery.js"></script>
     <script src="./config.js"></script>
     <script src="./js/post.js"></script>
-    <title><?php echo $post->title ?></title>
+    <script src="./js/likes.js"></script>
+    <script src="./js/favourite.js"></script>
+    <title><?php echo $post['title'] ?></title>
 
 </head>
 <body>
@@ -46,18 +50,29 @@ $url = $post->post_key . $post->extension;
     <main>
 
         <section id="post-wrapper">
-            <h1 class="post-title"><?php echo $post->title?></h1>
-            <p>
+
+            <p class="next">
                 <?php echo ($previousKey != 'Empty' ? "<a id='previous' href='./post.php?key=$previousKey'><- prev</a>":'')?>
                 <?php echo ($nextKey != 'Empty' ? "<a id='next' href='./post.php?key=$nextKey'>next -></a>":'')?>
             </p>
+            <h1 class="post-title"><?php echo $post['title']?></h1>
             <div id="img-wrapper">
                 <img id="post-image" src="./uploadsfolder/<?php echo $url?>">
             </div>
             <section id="description">
-                <?php echo $post->description?>
+                <?php echo $post['description'] ?>
             </section>
-            <form id="comment-form" action="./post.php?key=<?php echo $post->post_key?>" method="post">
+            <section id="react-section">
+                <i id="<?php echo $post['id']?>" class="like-icon fa fa-heart<?php echo (isset($post['liked']) ? '' : '-o') ?>" aria-hidden="true" onclick="like_post(this)">
+                    <p class="count-p"><span id="likes_count_<?php echo $post['id'] ?>"><?php echo $post['likes'] ?></span> likes</p>
+                </i>
+                <i id="<?php echo $post['id']?>" class="favo-icon fa fa-star<?php echo (isset($post['is_favourite']) ? '' : '-o') ?> icon" aria-hidden="true" onclick="favourite_post(this)">
+                    <p class="count-p"><span id="favourite_count_<?php echo $post['id'] ?>"><?php echo $post['favourites']?></span> favorites</p>
+                </i>
+
+
+            </section>
+            <form id="comment-form" action="./post.php?key=<?php echo $post['post_key'] ?>" method="post">
                 <textarea id="comment-field" name="comment-field" placeholder="Comment here.."></textarea>
                 <input type="submit" id="sub-button" name="sub-button">
             </form>

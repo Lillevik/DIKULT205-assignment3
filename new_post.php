@@ -23,6 +23,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     $err_arr = Array();
     $title = (isset($_POST['title']) ? $_POST['title'] : '');
     $description = (isset($_POST['description']) ? $_POST['description'] : '');
+    $tags = (isset($_POST['tags']) ? $_POST['tags'] : Array());
+    $numberOfTags = $tags.length;
+    if($numberOfTags > 1 AND $numberOfTags <= 5){
+        
+    }
 
     $target_dir = "uploadsfolder/";
     $target_file = $target_dir . basename($_FILES["file-upload"]['name']);
@@ -118,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
             <?php get_navigation(); ?>
         </header>
         <main>
-            <form action="new_post.php" method="POST" enctype="multipart/form-data">
+            <form action="new_post.php" method="POST" enctype="multipart/form-data" id="post-form">
                 <?php
                 if(isset($err_arr)){
                     foreach($err_arr as $msg){
@@ -130,16 +135,66 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
                 <img id="preview" src="#" alt="Your image is displayed here" title="Your image">
                 <label for="description" class="inputlabel">Description</label><textarea id="description" name="description" placeholder="Description..."></textarea>
                 <label for="file-upload" class="custom-file-upload">
-                    <img src="images/upload.png" id="upload-icon" alt="Upload icon">
-                    <i style="margin-right:10px;">Select image</i>
-                    <i class="file_text"></i>
+                    <div id="file-label-contents">
+                        <img src="images/upload.png" id="upload-icon" alt="Upload icon">
+                        <i style="margin-right:10px;">Select image file</i>
+                    </div>
                 </label>
                 <input id="file-upload" type="file" name="file-upload"/>
+                <div id="tags-container">
+                </div>
+                <p>Select between 1 to 5 tags for your post. An accurate title and use of relevant
+                tags helps others explore your post.</p>
+
+                <input type="checkbox" name="tags[]" value="funny" id="funny">
+                <label for="funny" class="tag-label">Funny</label>
+
+                <input type="checkbox" name="tags[]" value="art" id="art">
+                <label for="art" class="tag-label">Art</label>
+
+                <input type="checkbox" name="tags[]" value="nature" id="nature">
+                <label for="nature" class="tag-label">nature</label>
+
+                <input type="checkbox" name="tags[]" value="politics" id="politics">
+                <label for="politics" class="tag-label">Politics</label>
+
+                <input type="checkbox" name="tags[]" value="sports" id="sports">
+                <label for="sports" class="tag-label">Sports</label>
+
+                <input type="checkbox" name="tags[]" value="hobbies" id="hobbies">
+                <label for="hobbies" class="tag-label">Hobbies</label>
+
+                <input type="checkbox" name="tags[]" value="work" id="work">
+                <label for="work" class="tag-label">Work</label>
+
+                <input type="checkbox" name="tags[]" value="education" id="education">
+                <label for="education" class="tag-label">Education</label>
+
+                <input type="checkbox" name="tags[]" value="events" id="events">
+                <label for="events" class="tag-label">Events</label>
+
+                <input type="checkbox" name="tags[]" value="travel" id="travel">
+                <label for="travel" class="tag-label">Travel</label>
+
+                <input type="checkbox" name="tags[]" value="gaming" id="gaming">
+                <label for="gaming" class="tag-label">Gaming</label>
+
+                <input type="checkbox" name="tags[]" value="other" id="other">
+                <label for="other" class="tag-label">Other</label>
+
+                
                 <input type="submit" value="Publish">
 
             </form>
 
-            <script>
+            <script type="text/javascript">
+
+
+          
+
+            </script>
+
+            <script type="text/javascript">
                 function readURL(input) {
                     if (input.files && input.files[0]) {
                         var reader = new FileReader();
@@ -153,6 +208,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
                         reader.readAsDataURL(input.files[0]);
                     }
                 }
+
+                function checkboxlimit(checkgroup, limit){
+                    var checkgroup=checkgroup
+                    var limit=limit
+                    for (var i=0; i<checkgroup.length; i++){
+                        checkgroup[i].onclick=function(){
+                        var checkedcount=0
+                        for (var i=0; i<checkgroup.length; i++)
+                            checkedcount+=(checkgroup[i].checked)? 1 : 0
+                        if (checkedcount>limit){
+                            alert("You can only select a maximum of "+limit+" tags for your post.")
+                            this.checked=false
+                            }
+                        }
+                    }
+                }
+
+                checkboxlimit(document.getElementById('post-form').tags, 5)
 
 
 
