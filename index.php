@@ -95,18 +95,17 @@ include_once 'functions.php';
                     <section id="favourites" class="right-section">
                         <h1>Some of your favourites</h1>
                         <ul class="right-list">
-                            <?php echo_user_favourites() ?>
+                            <?php
+                            echo (isset($_SESSION['id']) ? echo_user_favourites() : '<p>No favourites to show. Try <a href="./login.php">logging in</a> to add some.</p>');
+                            ?>
                         </ul>
                     </section>
 
                     <section id="popular-categories" class="right-section">
-                        <h1>Popular categories</h1>
+                        <h1>Categories</h1>
                         <ul class="right-list">
                             <li class="right-list-item">
-                                Nature
-                            </li>
-                            <li class="right-list-item">
-                                Funny
+                                Work in progress..
                             </li>
                         </ul>
                     </section>

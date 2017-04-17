@@ -34,7 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     $title = $_POST['title'];
     $description = (isset($_POST['description']) ? $_POST['description'] : null);
     $post_id_or_key = (isset($_GET['post']) ? $_GET['post'] : null);
-    update_post($title, $description, $post_id_or_key);
+    $tags = $_POST['tags'];
+    update_post($title, $description, $post_id_or_key, $tags);
     header('Location: edit_post.php?post=' . $post_id_or_key . "&success=true");
     exit();
 }
@@ -71,8 +72,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
             <label for="title" class="inputlabel">Title</label><input type="text" id="title" name="title" placeholder="Title" value="<?php echo $title ?>">
             <img id="preview" src="./uploadsfolder/<?php echo $filename ?>" alt="Your image is displayed here" title="Your image">
             <label for="description" class="inputlabel">Description</label><textarea id="description" name="description" placeholder="Description..."><?php echo $description ?></textarea>
-            <a href="./delete.php?post=<?php echo $id ?>"><button type="button" id="delete-button">Delete</button></a>
-            <input type="submit" value="Update">
+
+            <?php echo_tags(get_post_tags($post_id_or_key))?>
+            <section id="buttons">
+                <a href="./delete.php?post=<?php echo $id ?>"><button type="button" id="delete-button">Delete</button></a>
+                <input type="submit" value="Update">
+            </section>
         </form>
     </body>
 </html>

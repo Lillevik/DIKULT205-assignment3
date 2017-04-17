@@ -17,6 +17,7 @@ function echo_metadata(){
 function get_navigation(){
     $domain = get_domain();
     $username = (isset($_SESSION['username']) ? $_SESSION['username'] : null);
+    $avatar = (!empty($_SESSION['avatar']) ? './avatars/' . $_SESSION['avatar'] : './images/profile.png');
     echo
         "<nav>
             <ul class='menulist'>
@@ -25,7 +26,7 @@ function get_navigation(){
                 . (isset($_SESSION['logged_in']) ?
 
                "<li class='rightmenuitem'><a href='$domain/logout.php' class='menulink'>Logout</a></li>
-                <li class='rightmenuitem'><a href='$domain/profile.php' class='menulink'>$username</a></li>" :
+                <li class='rightmenuitem'><a href='$domain/profile.php' class='menulink' id='profile-list-element'><img id='profile-avatar' src='$avatar'><span id='username'>$username</span></a></li>" :
 
                "<li class='rightmenuitem'><a href='$domain/login.php' class='menulink'>Login</a></li>" .
                "<li class='rightmenuitem'><a href='$domain/register.php' class='menulink'>Register</a></li>") .

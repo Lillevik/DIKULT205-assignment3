@@ -71,6 +71,10 @@ $url = $post['post_key'] . $post['extension'];
                 </i>
 
 
+
+            </section>
+            <section id="tag-section">
+                <?php echo_post_tags($post['id']) ?>
             </section>
             <form id="comment-form" action="./post.php?key=<?php echo $post['post_key'] ?>" method="post">
                 <textarea id="comment-field" name="comment-field" placeholder="Comment here.."></textarea>

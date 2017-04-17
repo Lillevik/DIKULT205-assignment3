@@ -5,8 +5,8 @@
  * Date: 08/04/2017
  * Time: 12:00
  */
-include '../../dbHandling.php';
-include '../../image_resizing.php';
+include 'dbHandling.php';
+include 'image_resizing.php';
 session_start();
 check_user_logged_in();
 //header("Location: /success?upload=true");
@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     $err_arr = Array();
     echo ($_FILES['inputFile']['size'] != 0);
     if($_FILES['inputFile']['size'] != 0){
-        $target_dir = "../../avatars/";
+        $target_dir = "./avatars/";
         $target_file = $target_dir . basename($_FILES["inputFile"]['name']);
         $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
         $filestring = random_string(6);
@@ -105,8 +105,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 <html>
     <head>
         <?php echo_metadata() ?>
-        <link rel="stylesheet" href="../../css/menu.css">
-        <link rel="stylesheet" href="../../css/avatar.css">
+        <link rel="stylesheet" href="css/menu.css">
+        <link rel="stylesheet" href="css/avatar.css">
     </head>
     <body>
         <header>
@@ -118,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
                 <h3>Select avatar</h3>
                 <h4><?php echo (isset($infoMsg)? $infoMsg : null)?></h4>
                 <img src="<?php echo ($_SESSION['avatar'] != null ? '../../avatars/' . $_SESSION['avatar'] : '../../images/profile.png')?>" id="avatar-preview">
-                <form action="./avatar.php" method="post" id="choose-avatar-form" enctype="multipart/form-data">
+                <form action="avatar.php" method="post" id="choose-avatar-form" enctype="multipart/form-data">
                     <label for="inputFile">Jpg, png or gif files</label>
                     <input id="inputFile" type="file" name="inputFile">
                     <label for="userImage">Or choose from your other avatars</label>

@@ -174,7 +174,7 @@ function validate_login($username_or_email, $password){
     }
 }
 
-function insert_new_image($title, $description, $filename, $userid){
+function insert_new_image($title, $description, $filename, $userid, $tags){
     $conn = get_conn();
     $now = date("Y-m-d H:i:s");
 
@@ -189,12 +189,22 @@ function insert_new_image($title, $description, $filename, $userid){
     /* Execute prepared statement */
     $stmt->execute();
 
-    $inertedId = $stmt->insert_id; // Do something with this
+    $post_id = $stmt->insert_id; // Do something with this
+
+    $stmt1 = $conn->prepare("INSERT INTO post_tags (tag_id, post_id) VALUES (?,?);");
+
+    foreach($tags as $tag){
+        $stmt1->bind_param('ii', $tag, $post_id);
+        $stmt1->execute();
+    }
+
+
 
     $conn->commit();
 
     /* Close db connection and statement*/
     $stmt->close();
+    $stmt1->close();
     $conn->close();
 }
 
@@ -265,7 +275,7 @@ function get_personal_posts(){
 
     $id = $_SESSION['id'];
 
-    $smnt = $conn->prepare('SELECT * FROM posts WHERE user_id = ?');
+    $smnt = $conn->prepare('SELECT id, title, description, likes, added, extension, post_key, user_id FROM posts WHERE user_id = ?');
     $smnt->bind_param('i', $id);
 
     $smnt->execute();
@@ -436,7 +446,7 @@ function delete_post($post_id_or_key){
     $conn->close();
 }
 
-function update_post($title, $description, $post_id_or_key){
+function update_post($title, $description, $post_id_or_key, $tags){
     $conn = get_conn();
 
     $queryParam = null;
@@ -452,6 +462,47 @@ function update_post($title, $description, $post_id_or_key){
 
     /* Execute prepared statement */
     $stmt->execute();
+
+
+
+    if($stmt1 = $conn->prepare("SELECT * FROM post_tags WHERE post_id = ?")){
+        $stmt1->bind_param('i', $post_id_or_key);
+        $stmt1->execute();
+        $stmt1->bind_result($id, $tag_id, $post_id);
+
+        $old_tags = Array();
+        $tags_to_delete = Array();
+        $tags_to_add = Array();
+
+        while($stmt1->fetch()){
+            $old_tags[$id] = $tag_id;
+        }
+
+
+        foreach($tags as $tag){
+            if(!in_array($tag, $old_tags)){
+                $tags_to_add[] = $tag;
+            }
+        }
+
+        foreach($old_tags as $tag){
+            if(!in_array($tag, $tags)){
+                $tags_to_delete[] = $tag;
+            };
+        }
+
+        foreach($tags_to_delete as $t){
+            $tag_id_to_delete = array_search($t, $old_tags);
+            delete_post_tag($tag_id_to_delete, $conn);
+        }
+
+        foreach ($tags_to_add as $t){
+            add_post_tag($post_id_or_key, $t, $conn);
+        }
+    };
+
+
+
 
     $conn->commit();
 
@@ -844,21 +895,101 @@ function echo_user_favourites(){
                                    WHERE favourites.user_id = ? limit 10;')){
             $smnt->bind_param('i', $user_id);
             $smnt->execute();
-
+            $smnt->store_result();
             $smnt->bind_result($title, $key);
-            while($smnt->fetch()){
-                echo "<li class='right-list-item'><a href='./post.php?key=$key'>$title</a></li>";
-            }
-        }else{
-            var_dump($conn->error);
-        };
+            if($smnt->num_rows > 0){
+                while($smnt->fetch()){
+                    echo "<li class='right-list-item'><a href='./post.php?key=$key'>$title</a></li>";
+                }
+            }else{
+                echo "<p>You have no favourites yet. Go ahead and add some by clicking the star icon!</p>";
+            };
+
+        }
 
 
     }else{
         return false;
     }
+}
 
+function get_post_tags($post_id, $con = null){
+    $conn = (isset($con) ? $con : get_conn());
 
+    $results = Array();
+    if($smnt = $conn->prepare("SELECT tags.id, tags.tag_name 
+                                        FROM post_tags 
+                                        JOIN tags ON (post_tags.tag_id = tags.id)
+                                        WHERE post_tags.post_id = ?;")){
+        $smnt->bind_param('i', $post_id);
+        $smnt->execute();
+        $smnt->bind_result($tag_id, $name);
+
+        while($smnt->fetch()){
+
+            $results[] = $tag_id;
+        }
+    }
+    return $results;
+}
+
+function echo_tags($selected = Array()){
+    $conn = get_conn();
+
+    if($smnt = $conn->prepare("SELECT * FROM tags;")){
+        $smnt->execute();
+        $smnt->bind_result($id, $tag_name);
+
+        while($smnt->fetch()){
+            $checked = (in_array($id, $selected) ? 'checked' : null);
+            echo "<input type='checkbox' name='tags[]' value='$id' id='$id' $checked>
+              <label for='$id' class='tag-label'>$tag_name</label>";
+        }
+    }
+}
+
+function echo_post_tags($post_id){
+    $tags = get_post_tags($post_id);
+
+    foreach($tags as $tag){
+        $id = $tag['id'];
+        $name = $tag['tag_name'];
+        echo "<p id='$id'>$name</p>";
+    }
+}
+
+function delete_post_tag($tag_id, $con = null){
+    $conn = (isset($con) ? get_conn() : $con);
+
+    /* Prevent sqlinjection */
+    $stmt = $conn->prepare('DELETE FROM post_tags WHERE id = ?;');
+    $stmt->bind_param('i', $tag_id);
+
+    /* Execute prepared statement */
+    $stmt->execute();
+
+    $conn->commit();
+
+    /* Close db connection and statement*/
+    $stmt->close();
+    $conn->close();
+}
+
+function add_post_tag($post_id, $tag_id, $con = null){
+    $conn = (isset($con) ? get_conn() : $con);
+
+    /* Prevent sqlinjection */
+    $stmt = $conn->prepare('INSERT INTO post_tags (post_id, tag_id) VALUES (?,?);');
+    $stmt->bind_param('ii', $post_id, $tag_id);
+
+    /* Execute prepared statement */
+    $stmt->execute();
+
+    $conn->commit();
+
+    /* Close db connection and statement*/
+    $stmt->close();
+    $conn->close();
 }
 
 ?>

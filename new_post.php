@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     $title = (isset($_POST['title']) ? $_POST['title'] : '');
     $description = (isset($_POST['description']) ? $_POST['description'] : '');
     $tags = (isset($_POST['tags']) ? $_POST['tags'] : Array());
-    $numberOfTags = $tags.length;
+    $numberOfTags = count($tags);
     if($numberOfTags > 1 AND $numberOfTags <= 5){
         
     }
@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     } else {
 
         if (move_uploaded_file($_FILES["file-upload"]["tmp_name"], $target_dir . $filename)) {
-                insert_new_image($title, $description,$filename, $_SESSION['id']);
+                insert_new_image($title, $description,$filename, $_SESSION['id'], $tags);
                 header('Location:./edit_post.php?post=' . $filestring . '&uploadSuccess=true');
                 exit();
         } else {
@@ -146,45 +146,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
                 <p>Select between 1 to 5 tags for your post. An accurate title and use of relevant
                 tags helps others explore your post.</p>
 
-                <input type="checkbox" name="tags[]" value="funny" id="funny">
-                <label for="funny" class="tag-label">Funny</label>
+                <?php
+                    echo_tags();
+                ?>
 
-                <input type="checkbox" name="tags[]" value="art" id="art">
-                <label for="art" class="tag-label">Art</label>
-
-                <input type="checkbox" name="tags[]" value="nature" id="nature">
-                <label for="nature" class="tag-label">nature</label>
-
-                <input type="checkbox" name="tags[]" value="politics" id="politics">
-                <label for="politics" class="tag-label">Politics</label>
-
-                <input type="checkbox" name="tags[]" value="sports" id="sports">
-                <label for="sports" class="tag-label">Sports</label>
-
-                <input type="checkbox" name="tags[]" value="hobbies" id="hobbies">
-                <label for="hobbies" class="tag-label">Hobbies</label>
-
-                <input type="checkbox" name="tags[]" value="work" id="work">
-                <label for="work" class="tag-label">Work</label>
-
-                <input type="checkbox" name="tags[]" value="education" id="education">
-                <label for="education" class="tag-label">Education</label>
-
-                <input type="checkbox" name="tags[]" value="events" id="events">
-                <label for="events" class="tag-label">Events</label>
-
-                <input type="checkbox" name="tags[]" value="travel" id="travel">
-                <label for="travel" class="tag-label">Travel</label>
-
-                <input type="checkbox" name="tags[]" value="gaming" id="gaming">
-                <label for="gaming" class="tag-label">Gaming</label>
-
-                <input type="checkbox" name="tags[]" value="other" id="other">
-                <label for="other" class="tag-label">Other</label>
-
-                
-                <input type="submit" value="Publish">
-
+                <section id="buttons">
+                    <input type="submit" value="Publish">
+                </section>
             </form>
 
             <script type="text/javascript">
@@ -210,8 +178,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
                 }
 
                 function checkboxlimit(checkgroup, limit){
-                    var checkgroup=checkgroup
-                    var limit=limit
                     for (var i=0; i<checkgroup.length; i++){
                         checkgroup[i].onclick=function(){
                         var checkedcount=0
@@ -224,8 +190,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
                         }
                     }
                 }
+                window.onload = function(){
+                    checkboxlimit(document.getElementById('post-form'), 5);
+                };
 
-                checkboxlimit(document.getElementById('post-form').tags, 5)
 
 
 

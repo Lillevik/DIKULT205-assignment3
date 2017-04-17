@@ -88,7 +88,6 @@ input[type="submit"]{
     display:block;
     float: right;
     padding:6px 12px;
-    margin-top: 20px;
     background-color:black;
     color:white;
     border:1px solid silver;
@@ -99,8 +98,7 @@ input[type="submit"]{
 #delete-button{
     display:block;
     float:left;
-    margin-left:3%;
-    padding:5px;
+    padding:6px 12px;
     background-color:#fa5c6a;
     border:1px solid silver;
     border-radius:2px;
@@ -109,7 +107,7 @@ input[type="submit"]{
 
 .success-message{
     display: block;
-    width: 90%;
+    width: 100%;
     color:#53c6f6;
     margin: 20px auto 0;
 }
@@ -141,5 +139,18 @@ input[type=checkbox]{
 
 input[type=checkbox]:checked + label {
   background:green;
-} 
+}
+
+#buttons{
+    padding-top:20px;
+    overflow: auto;
+    width: 100%;
+}
+
+
+@media(max-width: 500px){
+    form{
+        padding:5px;
+    }
+}
 
