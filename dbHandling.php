@@ -913,7 +913,7 @@ function echo_user_favourites(){
     }
 }
 
-function get_post_tags($post_id, $con = null){
+function get_post_tags($post_id, $ids_only = true, $con = null){
     $conn = (isset($con) ? $con : get_conn());
 
     $results = Array();
@@ -926,8 +926,14 @@ function get_post_tags($post_id, $con = null){
         $smnt->bind_result($tag_id, $name);
 
         while($smnt->fetch()){
-
-            $results[] = $tag_id;
+            if($ids_only) {
+                $results[] = $tag_id;
+            }else{
+                $arr = Array();
+                $arr['id'] = $tag_id;
+                $arr['tag_name'] = $name;
+                $results[] = $arr;
+            }
         }
     }
     return $results;
@@ -949,12 +955,12 @@ function echo_tags($selected = Array()){
 }
 
 function echo_post_tags($post_id){
-    $tags = get_post_tags($post_id);
+    $tags = get_post_tags($post_id, false);
 
     foreach($tags as $tag){
         $id = $tag['id'];
         $name = $tag['tag_name'];
-        echo "<p id='$id'>$name</p>";
+        echo "<p id='$id' class='post-tag'>$name</p>";
     }
 }
 

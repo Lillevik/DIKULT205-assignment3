@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         <link rel="stylesheet" href="css/menu.css">
         <link rel="stylesheet" href="css/newpost.css">
         <script type="text/javascript" src="js/jquery.js"></script>
-        <script src="http://cloud.tinymce.com/stable/tinymce.min.js?apiKey=vnl5crhqxbrkolf8f9f8yce1ni48ud128eyl9624aw0r22n9"></script>
+        <script src="https://cloud.tinymce.com/stable/tinymce.min.js?apiKey=vnl5crhqxbrkolf8f9f8yce1ni48ud128eyl9624aw0r22n9"></script>
         <script>tinymce.init({ selector:'#description' });</script>
         <style>
             #preview{

@@ -216,6 +216,21 @@ summary{
     float: left;
 }
 
+#tag-section{
+    width: 100%;
+    display: block;
+    overflow: auto;
+}
+
+.post-tag{
+    border: 1px solid #333;
+    float: left;
+    padding:5px;
+    background:rgba(183,217,227,0.96);
+    margin-right:5px;
+    border-radius:2px;
+}
+
 
 
 

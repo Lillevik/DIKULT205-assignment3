@@ -62,6 +62,9 @@ $url = $post['post_key'] . $post['extension'];
             <section id="description">
                 <?php echo $post['description'] ?>
             </section>
+            <section id="tag-section">
+                <?php echo_post_tags($post['id']) ?>
+            </section>
             <section id="react-section">
                 <i id="<?php echo $post['id']?>" class="like-icon fa fa-heart<?php echo (isset($post['liked']) ? '' : '-o') ?>" aria-hidden="true" onclick="like_post(this)">
                     <p class="count-p"><span id="likes_count_<?php echo $post['id'] ?>"><?php echo $post['likes'] ?></span> likes</p>
@@ -69,13 +72,8 @@ $url = $post['post_key'] . $post['extension'];
                 <i id="<?php echo $post['id']?>" class="favo-icon fa fa-star<?php echo (isset($post['is_favourite']) ? '' : '-o') ?> icon" aria-hidden="true" onclick="favourite_post(this)">
                     <p class="count-p"><span id="favourite_count_<?php echo $post['id'] ?>"><?php echo $post['favourites']?></span> favorites</p>
                 </i>
-
-
-
             </section>
-            <section id="tag-section">
-                <?php echo_post_tags($post['id']) ?>
-            </section>
+
             <form id="comment-form" action="./post.php?key=<?php echo $post['post_key'] ?>" method="post">
                 <textarea id="comment-field" name="comment-field" placeholder="Comment here.."></textarea>
                 <input type="submit" id="sub-button" name="sub-button">
