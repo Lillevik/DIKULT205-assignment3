@@ -22,11 +22,17 @@ function get_navigation(){
         "<nav>
             <ul class='menulist'>
                 <li class='menuitem'><a href='$domain/' class='menulink'>Home</a></li>
-                <li class='menuitem'><a href='$domain/new_post.php' class='menulink'>New post</a></li>"
+                <li class='menuitem'><a href='$domain/new_post.php' class='menulink newpost'>New post<i class='fa fa-plus-square-o' aria-hidden='true'></i></a></li>"
                 . (isset($_SESSION['logged_in']) ?
 
-               "<li class='rightmenuitem'><a href='$domain/logout.php' class='menulink'>Logout</a></li>
-                <li class='rightmenuitem'><a href='$domain/profile.php' class='menulink' id='profile-list-element'><img id='profile-avatar' src='$avatar'><span id='username'>$username</span></a></li>" :
+
+                "<li class='rightmenuitem' id='dropdown'><a href='$domain/profile.php' class='menulink' id='profile-list-element'>
+                <img id='profile-avatar' src='$avatar'><span id='username'>$username</span></a>
+                    <ul class='droplist'>
+                        <li class='droplist-item'><a href='./profile.php' class='menulink-dropdown'>Profile</a></li>
+                        <li class='droplist-item'><a href='./logout.php' class='menulink-dropdown'>Logout</a></li>
+                    </ul>
+                </li>" :
 
                "<li class='rightmenuitem'><a href='$domain/login.php' class='menulink'>Login</a></li>" .
                "<li class='rightmenuitem'><a href='$domain/register.php' class='menulink'>Register</a></li>") .

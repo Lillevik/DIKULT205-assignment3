@@ -19,13 +19,16 @@ include_once 'functions.php';
             echo_metadata();
         ?>
         <title>Picstr</title>
+        <link rel="icon" type="image/svg+xml" href="./images/logo.svg">
+        <link href="https://use.fontawesome.com/db87107c26.css" media="all" rel="stylesheet">
+
         <link rel="stylesheet" href="css/menu.css">
         <link rel="stylesheet" href="css/index.css">
-        <link href="https://use.fontawesome.com/db87107c26.css" media="all" rel="stylesheet">
         <script type="text/javascript" src="./js/jquery.js"></script>
         <script type="text/javascript" src="./config.js"></script>
         <script type="text/javascript" src="./js/likes.js"></script>
         <script type="text/javascript" src="./js/favourite.js"></script>
+        <script type="text/javascript" src="./js/script.js"></script>
 
     </head>
 
@@ -47,46 +50,7 @@ include_once 'functions.php';
 
                 ?>
 
-                        <section id="next-section">
-            <?php
-                $totalPages = $results['totalPages'];
-                $previous = $page - 1;
-                $next = $page + 1;
-                
-                
 
-                echo "<ul id='pages-list'>";
-                $max = (($page + 5) > $totalPages ? $totalPages:($page + 5));
-                $start = (($page - 5) > 0 ? ($page - 5) : 0);
-
-
-                if($max == $totalPages && $max - 10 > 0){
-                    $start = $max - 10;
-                }elseif ($start == 0 && $start + 10 < $totalPages){
-                    $max = 10;
-                }
-                echo ($previous > 0 ? "<li class='page-list-element bottom-navigation'><a href='./?page=$previous'><-Prev</a></li>":null);
-                for ($i = $start; $i < $max;$i++){
-                    $p = ($i + 1);
-                    if($p <= $totalPages){
-                        if($p != $page){
-                            echo "<li class='page-list-element'>[<a href='./?page=$p'>" . $p . "</a>]</li>";
-                        }else{
-                            echo "<li class='page-list-element'>[<b><a href='./?page=$p'>" . $p . "</a></b>]</li>";
-                        }
-                    }else{
-                        break;
-                    }
-                };
-                if($max != $totalPages){
-                    echo "<li class='page-list-element'>..[<a href='./?page=$totalPages'>" . $totalPages . "</a>]</li>";
-                }
-
-                echo ($next <= $totalPages ? "<li class='page-list-element bottom-navigation'><a href='./?page=$next'>next-></a></li>":null);
-
-                echo "</ul>";
-            ?>
-        </section>
 
             </div>
 
@@ -113,6 +77,47 @@ include_once 'functions.php';
             </div>
 
         </main>
+
+        <section id="next-page-section">
+            <?php
+            $totalPages = $results['totalPages'];
+            $previous = $page - 1;
+            $next = $page + 1;
+
+
+
+            echo "<ul id='pages-list'>";
+            $max = (($page + 5) > $totalPages ? $totalPages:($page + 5));
+            $start = (($page - 5) > 0 ? ($page - 5) : 0);
+
+
+            if($max == $totalPages && $max - 10 > 0){
+                $start = $max - 10;
+            }elseif ($start == 0 && $start + 10 < $totalPages){
+                $max = 10;
+            }
+            echo ($previous > 0 ? "<li class='page-list-element bottom-navigation'><a href='./?page=$previous'><-Prev</a></li>":null);
+            for ($i = $start; $i < $max;$i++){
+                $p = ($i + 1);
+                if($p <= $totalPages){
+                    if($p != $page){
+                        echo "<li class='page-list-element'>[<a href='./?page=$p'>" . $p . "</a>]</li>";
+                    }else{
+                        echo "<li class='page-list-element'>[<b><a href='./?page=$p'>" . $p . "</a></b>]</li>";
+                    }
+                }else{
+                    break;
+                }
+            };
+            if($max != $totalPages){
+                echo "<li class='page-list-element'>..[<a href='./?page=$totalPages'>" . $totalPages . "</a>]</li>";
+            }
+
+            echo ($next <= $totalPages ? "<li class='page-list-element bottom-navigation'><a href='./?page=$next'>next-></a></li>":null);
+
+            echo "</ul>";
+            ?>
+        </section>
 
 
         <footer>

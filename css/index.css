@@ -4,6 +4,13 @@ main{
     display: flex;
     justify-content: center;
     max-width: 100%;
+    position: relative;
+}
+
+footer{
+    min-height: 300px;
+    width: 100vw;
+    background:#333;
 }
 
 #post-container{
@@ -17,22 +24,24 @@ main{
     display: block;
     height:100%;
     position: relative;
+    align-self: auto;
 }
 
 .right-section{
-    margin: 0 10px 10px;
-    border: 1px solid silver;
-    border-radius: 2px;
+    min-height: 200px;
+    padding:10px;
+    border-radius:2px;
     -webkit-box-shadow: 0 0 30px -4px rgba(153,133,153,1);
     -moz-box-shadow: 0 0 30px -4px rgba(153,133,153,1);
     box-shadow: 0 0 30px -4px rgba(153,133,153,1);
-    padding:20px;
-    min-height: 200px;
+    background-color:#f8f9fd;
+    margin: 0 auto 20px;
+    max-width: 95%;
 }
 
 #fixed-wrapper{
-    position: fixed;
     width: inherit;
+    position: fixed;
 }
 
 .right-list-item{
@@ -52,7 +61,6 @@ main{
 .post-wrapper{
     width: 500px;
     padding:10px;
-    border: 1px solid silver;
     border-radius:2px;
     -webkit-box-shadow: 0 0 30px -4px rgba(153,133,153,1);
     -moz-box-shadow: 0 0 30px -4px rgba(153,133,153,1);
@@ -146,6 +154,17 @@ main{
 .bottom-navigation{
     padding-right:10px;
     padding-left:10px;
+}
+
+#pages-list{
+    max-width: calc(100% - 20px);
+    width: 815px;
+    padding:5px;
+    margin: auto auto 20px;
+    background:#f8f9fd;
+    -webkit-box-shadow: 0 0 30px -4px rgba(153,133,153,1);
+    -moz-box-shadow: 0 0 30px -4px rgba(153,133,153,1);
+    box-shadow: 0 0 30px -4px rgba(153,133,153,1);
 }
 
 

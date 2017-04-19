@@ -1,6 +1,7 @@
 body{
     margin:0;
     padding: 40px 0 0;
+    background:rgba(213,243,255,0.96); /*  rgba(186,252,255,0.96);  */
 }
 
 header{
@@ -16,7 +17,7 @@ header{
 
 nav{
     background-color:#333;;
-    width:900px;
+    width:840px;
     max-width: 100%;
     margin:auto;
 }
@@ -31,11 +32,19 @@ text, p, label, span, input, li, a, time, h1, h2, h3, summary{
     margin:0;
 }
 
+nav > a{
+    font-size: 20px;
+}
+
 .menuitem{
     float: left;
     list-style: none;
     margin:0;
     text-decoration:none;
+}
+
+.newpost{
+    background-color:rgba(42,158,172,0.96);
 }
 
 .rightmenuitem{
@@ -46,26 +55,16 @@ text, p, label, span, input, li, a, time, h1, h2, h3, summary{
 }
 
 
-.droplist{
-    display: none;
-    position: fixed;
-    top:38px;
-    right:0;
-}
-
-#dropdown:hover + #droplist{
-    display: block;
-}
-
-.dropitem{
-    list-style: none;
-    margin:0;
-    background-color: grey;
-    text-decoration: none;
-}
-
 .menulink:hover{
     background-color:rgba(119, 120, 124, .80);
+    color:white;
+    text-decoration:none;
+    transform: scale(1.05);
+    transition:all 0.3s;
+}
+
+.newpost:hover{
+    background-color:rgba(42,158,172,0.96);
     color:white;
     text-decoration:none;
 }
@@ -105,4 +104,54 @@ text, p, label, span, input, li, a, time, h1, h2, h3, summary{
 #profile-avatar{
     height: 20px;
     padding:2px;
+}
+
+.droplist{
+    background:#333;
+    display: none;
+    position: absolute;
+    right:0;
+    width: 100%;
+    padding: 0;
+    list-style: none;
+    margin: 0;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+#dropdown{
+    position: relative;
+
+}
+
+#dropdown:hover > .droplist{
+    display: block;
+}
+
+#dropdown:hover{
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.menulink-dropdown{
+    text-align: center;
+    text-decoration: none;
+    border-radius: 10px;
+    padding:5px;
+    margin:5px;
+    width: calc(100% - 20px);
+    color: white;
+    display: block;
+}
+
+.menulink-dropdown:hover{
+    background-color:rgba(119, 120, 124, .80);
+    text-decoration:none;
+    transform: scale(1.05);
+    transition:transform 0.3s;
+}
+
+.fa-plus-square-o{
+    padding-left:5px;
+    font-size: 10px;
 }
