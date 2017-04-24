@@ -165,6 +165,12 @@ footer{
     -webkit-box-shadow: 0 0 30px -4px rgba(153,133,153,1);
     -moz-box-shadow: 0 0 30px -4px rgba(153,133,153,1);
     box-shadow: 0 0 30px -4px rgba(153,133,153,1);
+    min-height: 18px;
+}
+
+#search-results{
+    width: 820px;
+    margin:0 auto;
 }
 
 

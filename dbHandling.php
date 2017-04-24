@@ -39,10 +39,14 @@ class Post{
     var $extension;
     var $post_key;
     var $user_id;
+    var $username;
+    var $likes_id;
+    var $favourite_id;
 
 
 
-    function __construct($id, $title, $description, $likes, $added, $extension, $post_key, $user_id) {
+
+    function __construct($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $username = 'anon', $liked_id = null, $favourite_id = null) {
         $this->id = $id;
         $this->title = $title;
         $this->description = $description;
@@ -51,7 +55,9 @@ class Post{
         $this->extension = $extension;
         $this->post_key = $post_key;
         $this->user_id = $user_id;
-
+        $this->username = $username;
+        $this->liked_id = $liked_id;
+        $this->favourite_id = $favourite_id;
     }
 }
 
@@ -209,65 +215,81 @@ function insert_new_image($title, $description, $filename, $userid, $tags){
 }
 
 
-function echo_posts($offset){
+function get_posts($offset, $searchQuery = ''){
     $conn = get_conn();
-    if($offset > 0){
-
-    }
     $offset = ($offset - 1) * 10;
-
     $logged_in_user_id = (isset($_SESSION['id']) ? $_SESSION['id'] : '');
+    $posts = Array();
 
-    //
-    $smnt = $conn->prepare('SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, users.id, likes.user_id, favourites.user_id
-                            FROM posts
-                            JOIN users ON (posts.user_id = users.id ) 
-                            LEFT JOIN likes ON (likes.user_id = ? AND posts.id = likes.post_id)
-                            LEFT JOIN favourites ON (favourites.user_id = ? AND posts.id = favourites.post_id)
-                            ORDER BY posts.id desc LIMIT 10 OFFSET ?;');
-    $smnt->bind_param('iii', $logged_in_user_id, $logged_in_user_id ,$offset);
-    $smnt->execute();
+    if(!empty($searchQuery)){
+        $posts = search($searchQuery);
+    }else{
+        $smnt = $conn->prepare('SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, posts.user_id, likes.user_id, favourites.user_id
+                                       FROM posts
+                                       JOIN users ON (posts.user_id = users.id ) 
+                                       LEFT JOIN likes ON (likes.user_id = ? AND posts.id = likes.post_id)
+                                       LEFT JOIN favourites ON (favourites.user_id = ? AND posts.id = favourites.post_id)
+                                       ORDER BY posts.id desc LIMIT 10 OFFSET ?;');
+        $smnt->bind_param('iii', $logged_in_user_id, $logged_in_user_id ,$offset);
+        $smnt->execute();
 
-    $smnt->store_result();
-    $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $user_id, $liked_id, $favourite_id);
-
-    $current_rows = null;
-    $liked = "fa-heart";
-    $not_liked = "fa-heart-o";
+        $smnt->store_result();
+        $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $user_id, $liked_id, $favourite_id);
 
 
-    while($smnt->fetch()){
-        $cropped_image = $post_key . 'c' . $extension;
-        $current_rows = $smnt->num_rows;
-        echo '<section class="post-wrapper">
-                    <h1 class="post-title">'. $title .'</h1>
-                    <a href="./post.php?key='.$post_key.'">
-                    <img class="post-image" src="./uploadsfolder/' . $cropped_image . '" onclick="start_gif(this)">' .
-                    '</a>' .
-                    '<section class="details">
-                            <p class="post-description">' .$description . '</p><hr>' .
-                           '<time class="date">Added:'. date("d/m/Y", strtotime($added)).'</time>' .
-                           '<p class="likes">
-                                <i class="fa fa-star' . (isset($favourite_id) ? "":"-o") . '" id="'.$id.'" onclick="favourite_post(this)"></i>
-                                <i class="fa '.((isset($liked_id)) ? $liked : $not_liked) .'" id="'.$id.'"  onclick="like_post(this)"></i>
-                                <span id="likes_count_'.$id.'">'.$likes.'</span> likes
-                            </p>' .
-                           '<p class="post-username">Posted by: '.$username . '</p>' . ($logged_in_user_id == $user_id ? '<a href="./edit_post.php?post='.$id.'"><img src="./images/edit.png" class="edit-icon"></a>' : '') .
-                    '</section>'  .
-              '</section>';
+
+        while($smnt->fetch()){
+            $posts[] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $username, $liked_id, $favourite_id);
+        }
     }
 
-    $smnt1 = $conn->prepare('SELECT COUNT(id) FROM posts;');
-    $smnt1->execute();
-    $smnt1->bind_result($id);
-    if($smnt1->fetch()){
+    $current_rows = count($posts);
+
+
+
+    if(empty($searchQuery)){
+        $smnt1 = $conn->prepare('SELECT COUNT(id) FROM posts;');
+        $smnt1->execute();
+        $smnt1->bind_result($id);
+        if($smnt1->fetch()){
+            $arr = Array();
+            $arr['currentResults'] = $current_rows;
+            $arr['totalPosts'] = $id;
+            $arr['totalPages'] = ceil($id/10);
+            $arr['posts'] = $posts;
+            return $arr;
+        }
+    }else{
         $arr = Array();
         $arr['currentResults'] = $current_rows;
-        $arr['totalPosts'] = $id;
-        $arr['totalPages'] = ceil($id/10);
+        $arr['totalPosts'] = count($posts);
+        $arr['totalPages'] = ceil(count($posts)/10);
+        $arr['posts'] = $posts;
         return $arr;
     }
+}
 
+function echo_posts($posts){
+    $logged_in_user_id = (isset($_SESSION['id']) ? $_SESSION['id'] : '');
+    foreach($posts as $post){
+        $cropped_image = $post->post_key . 'c' . $post->extension;
+        echo '<section class="post-wrapper">
+                    <h1 class="post-title">'. $post->title .'</h1>
+                    <a href="./post.php?key='.$post->post_key.'">
+                    <img class="post-image" src="./uploadsfolder/' . $cropped_image . '" onclick="start_gif(this)">' .
+            '</a>' .
+            '<section class="details">
+                            <p class="post-description">' .$post->description . '</p><hr>' .
+            '<time class="date">Added:'. date("d/m/Y", strtotime($post->added)).'</time>' .
+            '<p class="likes">
+                                <i class="fa fa-star' . (isset($post->favourite_id) ? "":"-o") . '" id="'.$post->id.'" onclick="favourite_post(this)"></i>
+                                <i class="fa fa-heart'.(isset($post->liked_id) ? "" : "-o") .'" id="'.$post->id.'"  onclick="like_post(this)"></i>
+                                <span id="likes_count_'.$post->id.'">'.$post->likes.'</span> likes
+                            </p>' .
+            '<p class="post-username">Posted by: '.$post->username . '</p>' . ($logged_in_user_id == $post->user_id ? '<a href="./edit_post.php?post='.$post->id.'"><img src="./images/edit.png" class="edit-icon"></a>' : '') .
+            '</section>'  .
+            '</section>';
+    }
 }
 
 function get_personal_posts(){
@@ -996,6 +1018,47 @@ function add_post_tag($post_id, $tag_id, $con = null){
     /* Close db connection and statement*/
     $stmt->close();
     $conn->close();
+}
+
+function search($query , $con = null){
+    $conn = (isset($con) ? $con : get_conn());
+    $logged_in_user_id = (isset($_SESSION['id']) ? $_SESSION['id'] : '');
+
+    $posts = Array();
+    $param = "%$query%";
+    if($stmt = $conn->prepare("SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, posts.user_id, likes.user_id, favourites.user_id 
+                                      FROM posts 
+                                      JOIN users ON (posts.user_id = users.id ) 
+                                      LEFT JOIN likes ON (likes.user_id = ? AND posts.id = likes.post_id)
+                                      LEFT JOIN favourites ON (favourites.user_id = ? AND posts.id = favourites.post_id)
+                                      WHERE title LIKE ?;")){
+        $stmt->bind_param('iis', $logged_in_user_id,$logged_in_user_id,$param);
+        $stmt->execute();
+        $stmt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $user_id, $liked_id, $favourite_id);
+        while($stmt->fetch()){
+            $posts[$id] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $username, $liked_id, $favourite_id);
+        }
+    }
+
+
+    if($stmt1 = $conn->prepare("SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, posts.user_id, likes.user_id, favourites.user_id
+                                       FROM post_tags
+                                       JOIN tags ON  post_tags.tag_id = tags.id
+                                       JOIN posts ON  post_tags.post_id = posts.id
+                                       JOIN users ON (posts.user_id = users.id ) 
+                                       LEFT JOIN likes ON (likes.user_id = ? AND posts.id = likes.post_id)
+                                       LEFT JOIN favourites ON (favourites.user_id = ? AND posts.id = favourites.post_id)
+                                       WHERE tags.tag_name LIKE ?;")){ //LIMIT 10 OFFSET ? TODO
+        $stmt1->bind_param('iis', $logged_in_user_id,$logged_in_user_id,$param);
+        $stmt1->execute();
+        $stmt1->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $user_id, $liked_id, $favourite_id);
+        while($stmt1->fetch()){
+            if(!array_key_exists($id, $posts)) {
+                $posts[$id] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $username, $liked_id, $favourite_id);
+            }
+        }
+    }
+    return $posts;
 }
 
 ?>
