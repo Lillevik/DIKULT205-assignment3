@@ -117,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
             <section>
                 <h3>Select avatar</h3>
                 <h4><?php echo (isset($infoMsg)? $infoMsg : null)?></h4>
-                <img src="<?php echo ($_SESSION['avatar'] != null ? './avatars/' . $_SESSION['avatar'] : '../../images/profile.png')?>" id="avatar-preview">
+                <img src="<?php echo ($_SESSION['avatar'] != null ? './avatars/' . $_SESSION['avatar'] : './images/profile.png')?>" id="avatar-preview">
                 <form action="avatar.php" method="post" id="choose-avatar-form" enctype="multipart/form-data">
                     <label for="inputFile">Jpg, png or gif files</label>
                     <input id="inputFile" type="file" name="inputFile">
