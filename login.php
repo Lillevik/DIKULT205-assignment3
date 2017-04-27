@@ -19,12 +19,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     }else{
         $required = true;
     }
+}else if($_SERVER["REQUEST_METHOD"] == "GET"){
+    require "functions.php";
 }
 
 
 ?>
 
 <head>
+    <?php echo_metadata() ?>
     <link rel="stylesheet" href="css/login.css">
 </head>
 <body>
@@ -39,10 +42,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                 }else if(isset($required)){
                     echo '<p id="wronginfo">Please enter a username and password.</p>';
                 }
-                echo (isset($_GET['logout']) ? '<p id="info">Successfully logged out</p>' : null);
-                echo (isset($_GET['access']) ? '<p id="wronginfo">You need to login first.</p>' : null);
+                echo (isset($_GET['logout']) ? '<p id="info">Successfully logged out</p>' : "");
+                echo (isset($_GET['access']) ? '<p id="wronginfo">You need to login first.</p>' : "");
             ?>
-            <p id="forgotPass"><a href="./forgotPassword.php">Forgot password?</a></p>
+            <p id="forgotPass">
+                <a href="./forgotPassword.php">Forgot password?</a>
+            </p>
         </form>
     </main>
 </body>

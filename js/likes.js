@@ -38,11 +38,11 @@ function like_post(element) {
                 url: host_url + "add_like",
                 success: function(data){
                     working = false;
-                    if(data == 'Success'){
+                    if(data === 'Success'){
                         likesCount.text(parseInt(likesCount.text()) +1);
                         element.classList.remove('fa-heart-o');
                         element.classList.add('fa-heart');
-                    }else if(data == 'Access denied'){
+                    }else if(data === 'Access denied'){
                         alert('You need to login to like posts.')
                     }
                 }

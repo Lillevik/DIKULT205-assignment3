@@ -8,9 +8,13 @@
 require 'password.php';
 include_once 'functions.php';
 include 'config.php';
+include get_connect_path();
 
 
 /**
+ *
+ * Creates and returns a mysqli connection
+ * using the credentials found in the config file
  * @return mysqli connection
  */
 function get_conn(){
@@ -30,6 +34,11 @@ function get_conn(){
     return $conn;
 }
 
+/**
+ * Class Post
+ * Used for creating objects post object
+ * in order to return them in a list.
+ */
 class Post{
     var $id;
     var $title;
@@ -44,8 +53,20 @@ class Post{
     var $favourite_id;
 
 
-
-
+    /**
+     * Post constructor.
+     * @param $id
+     * @param $title
+     * @param $description
+     * @param $likes
+     * @param $added
+     * @param $extension
+     * @param $post_key
+     * @param $user_id
+     * @param string $username
+     * @param null $liked_id
+     * @param null $favourite_id
+     */
     function __construct($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $username = 'anon', $liked_id = null, $favourite_id = null) {
         $this->id = $id;
         $this->title = $title;
@@ -61,6 +82,11 @@ class Post{
     }
 }
 
+/**
+ * Class Comment
+ * Used for creating objects post object
+ * in order to return them in a list.
+ */
 class Comment{
     var $id;
     var $text;
@@ -72,6 +98,17 @@ class Comment{
     var $username;
     var $avatar;
 
+    /**
+     * Comment constructor.
+     * @param $id
+     * @param $text
+     * @param $user_id
+     * @param $time
+     * @param $parent_id
+     * @param $post_key
+     * @param string $username
+     * @param null $avatar
+     */
     function __construct($id, $text, $user_id, $time, $parent_id, $post_key, $username = 'Anonymous', $avatar = null){
         $this->id = $id;
         $this->text = $text;
@@ -85,12 +122,24 @@ class Comment{
     }
 }
 
+/**
+ * Class Avatar
+ * Used for creating objects post object
+ * in order to return them in a list.
+ */
 class Avatar{
     var $id;
     var $key;
     var $extension;
     var $user_id;
 
+    /**
+     * Avatar constructor.
+     * @param $id
+     * @param $key
+     * @param $extension
+     * @param $user_id
+     */
     function __construct($id, $key, $extension, $user_id){
         $this->id = $id;
         $this->key = $key;
@@ -100,6 +149,10 @@ class Avatar{
 }
 
 /**
+ *
+ * This function inserts a new user into the database.
+ * The password is converted into a hash for better security.
+ *
  * @param $email
  * @param $username
  * @param $password
@@ -123,6 +176,11 @@ function insert_new_user($email, $username, $password){
 }
 
 /**
+ *
+ * This functions checks the database for an existing user
+ * and returns an array with the already exsisting columns values.
+ * E.g username, email
+ *
  * @param $username_to_check
  * @param $email_to_check
  * @return array
@@ -153,6 +211,14 @@ function user_exists($username_to_check, $email_to_check){
     return $duplicates;
 }
 
+/**
+ * This function
+ *
+ *
+ * @param $username_or_email
+ * @param $password
+ * @return bool
+ */
 function validate_login($username_or_email, $password){
     $conn = get_conn();
 
@@ -180,7 +246,17 @@ function validate_login($username_or_email, $password){
     }
 }
 
-function insert_new_image($title, $description, $filename, $userid, $tags){
+/**
+ * Adds a new post into the database using
+ * the given parameters
+ *
+ * @param $title - post title
+ * @param $description - post description
+ * @param $filename - The filename of the posts image
+ * @param $userid - the post authors user's id
+ * @param $tags - An array of tags for the post
+ */
+function insert_new_post($title, $description, $filename, $userid, $tags){
     $conn = get_conn();
     $now = date("Y-m-d H:i:s");
 
@@ -215,21 +291,33 @@ function insert_new_image($title, $description, $filename, $userid, $tags){
 }
 
 
+/**
+ * Fetches up to 10 posts from the database after a given offset.
+ * If the query parameter is given, the search function is executed and
+ * returns a list of posts that matches the search query.
+ *
+ * @param $offset
+ * @param string $searchQuery
+ * @return array
+ */
 function get_posts($offset, $searchQuery = ''){
     $conn = get_conn();
     $offset = ($offset - 1) * 10;
     $logged_in_user_id = (isset($_SESSION['id']) ? $_SESSION['id'] : '');
     $posts = Array();
 
+    /* Search for posts if query is give or fetches after offset if not */
     if(!empty($searchQuery)){
-        $posts = search($searchQuery);
+        $posts = search($searchQuery, $conn);
     }else{
+        /* Prepare statement to prevent sqlinjection */
         $smnt = $conn->prepare('SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, posts.user_id, likes.user_id, favourites.user_id
                                        FROM posts
                                        JOIN users ON (posts.user_id = users.id ) 
                                        LEFT JOIN likes ON (likes.user_id = ? AND posts.id = likes.post_id)
                                        LEFT JOIN favourites ON (favourites.user_id = ? AND posts.id = favourites.post_id)
                                        ORDER BY posts.id desc LIMIT 10 OFFSET ?;');
+        /* Bind parameters */
         $smnt->bind_param('iii', $logged_in_user_id, $logged_in_user_id ,$offset);
         $smnt->execute();
 
@@ -237,7 +325,7 @@ function get_posts($offset, $searchQuery = ''){
         $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $user_id, $liked_id, $favourite_id);
 
 
-
+        /* Adds post objects to a list */
         while($smnt->fetch()){
             $posts[] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $username, $liked_id, $favourite_id);
         }
@@ -269,6 +357,12 @@ function get_posts($offset, $searchQuery = ''){
     }
 }
 
+/**
+ * This function echo's posts from a given
+ * array of posts objects.
+ *
+ * @param $posts - array of post objects
+ */
 function echo_posts($posts){
     $logged_in_user_id = (isset($_SESSION['id']) ? $_SESSION['id'] : '');
     foreach($posts as $post){
@@ -292,11 +386,18 @@ function echo_posts($posts){
     }
 }
 
+/**
+ * Gets all the posts for the logged in user.
+ * Used in the profile page.
+ *
+ * @return array - An array of post objects
+ */
 function get_personal_posts(){
     $conn = get_conn();
 
     $id = $_SESSION['id'];
 
+    /* Prepare statement to prevent sqlinjection */
     $smnt = $conn->prepare('SELECT id, title, description, likes, added, extension, post_key, user_id FROM posts WHERE user_id = ?');
     $smnt->bind_param('i', $id);
 
@@ -307,104 +408,85 @@ function get_personal_posts(){
 
     $post_arr = Array();
     while($smnt->fetch()){
-        $post = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id);
-        array_push($post_arr, $post);
+        $post_arr[] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id);
     }
+    //Return array of post objects
     return $post_arr;
 }
 
-function insert_like($post_id, $user_id){
+
+/**
+ * This function deletes a favourite or like from the given table
+ * in the database using the given post_id and user_id and updates the
+ * total count for the posts favourites or likes.
+ *
+ * @param $post_id
+ * @param $user_id
+ * @param $favourite_or_like_table
+ */
+function delete_favourite_or_like($post_id, $user_id, $favourite_or_like_table){
+    $conn = get_conn();
+
+    /* Prepare statement to prevent sqlinjection */
+    $stmt = $conn->prepare('DELETE FROM '.$favourite_or_like_table.' WHERE post_id = ? AND user_id = ?;');
+    $stmt->bind_param('ii', $post_id, $user_id);
+
+    $stmt1 = $conn->prepare('UPDATE posts SET '.$favourite_or_like_table.' = '.$favourite_or_like_table.' - 1 WHERE id = ?;');
+    $stmt1->bind_param('i', $post_id);
+
+    /* Execute prepared statement */
+    $stmt->execute();
+    $stmt1->execute();
+
+    $conn->commit();
+
+    /* Close db connection and statement*/
+    $stmt->close();
+    $stmt1->close();
+    $conn->close();
+}
+
+/**
+ * This function deletes a favourite or like from the given table
+ * in the database using the given post_id and user_id and updates the
+ * total count for the posts favourites or likes.
+ *
+ * @param $post_id
+ * @param $user_id
+ * @param $favourite_or_like_table
+ */
+function insert_favourite_or_like($post_id, $user_id, $favourite_or_like_table){
     // Get a database connection
     $conn = get_conn();
 
     /* Prepare statement and prevent sqlinjection */
-    $stmt = $conn->prepare('INSERT INTO likes (post_id, user_id) VALUES (?, ?);');
-    $stmt->bind_param('ii', $post_id, $user_id);
+    if($stmt = $conn->prepare('INSERT INTO '.$favourite_or_like_table.' (post_id, user_id) VALUES (?, ?);')){
+        $stmt->bind_param('ii', $post_id, $user_id);
 
 
-    $stmt1 = $conn->prepare('UPDATE posts SET likes = likes + 1 WHERE id = ?;');
-    $stmt1->bind_param('i', $post_id);
+        $stmt1 = $conn->prepare('UPDATE posts SET '.$favourite_or_like_table.' = '.$favourite_or_like_table.' + 1 WHERE id = ?;');
+        $stmt1->bind_param('i', $post_id);
 
-    /* Execute prepared statement */
-    $stmt->execute();
-    $stmt1->execute();
-    $conn->commit();
+        /* Execute prepared statement */
+        $stmt->execute();
+        $stmt1->execute();
+        $conn->commit();
 
-    /* Close db connection and statement*/
-    $stmt->close();
-    $stmt1->close();
-    $conn->close();
+        /* Close db connection and statements*/
+        $stmt->close();
+        $stmt1->close();
+        $conn->close();
+    }
 }
 
-
-function delete_like($post_id, $user_id){
-    $conn = get_conn();
-
-    /* Prevent sqlinjection */
-    $stmt = $conn->prepare('DELETE FROM likes WHERE post_id = ? AND user_id = ?;');
-    $stmt->bind_param('ii', $post_id, $user_id);
-
-    $stmt1 = $conn->prepare('UPDATE posts SET likes = likes - 1 WHERE id = ?;');
-    $stmt1->bind_param('i', $post_id);
-
-    /* Execute prepared statement */
-    $stmt->execute();
-    $stmt1->execute();
-
-    $conn->commit();
-
-    /* Close db connection and statement*/
-    $stmt->close();
-    $stmt1->close();
-    $conn->close();
-}
-
-function insert_favourite($post_id, $user_id){
-    // Get a database connection
-    $conn = get_conn();
-
-    /* Prepare statement and prevent sqlinjection */
-    $stmt = $conn->prepare('INSERT INTO favourites (post_id, user_id) VALUES (?, ?);');
-    $stmt->bind_param('ii', $post_id, $user_id);
-
-
-    $stmt1 = $conn->prepare('UPDATE posts SET favourites = favourites + 1 WHERE id = ?;');
-    $stmt1->bind_param('i', $post_id);
-
-    /* Execute prepared statement */
-    $stmt->execute();
-    $stmt1->execute();
-    $conn->commit();
-
-    /* Close db connection and statement*/
-    $stmt->close();
-    $stmt1->close();
-    $conn->close();
-}
-
-function delete_favourite($post_id, $user_id){
-    $conn = get_conn();
-
-    /* Prevent sqlinjection */
-    $stmt = $conn->prepare('DELETE FROM favourites WHERE post_id = ? AND user_id = ?;');
-    $stmt->bind_param('ii', $post_id, $user_id);
-
-    $stmt1 = $conn->prepare('UPDATE posts SET favourites = favourites - 1 WHERE id = ?;');
-    $stmt1->bind_param('i', $post_id);
-
-    /* Execute prepared statement */
-    $stmt->execute();
-    $stmt1->execute();
-
-    $conn->commit();
-
-    /* Close db connection and statement*/
-    $stmt->close();
-    $stmt1->close();
-    $conn->close();
-}
-
-
+/**
+ * This function fetches a single post from the database using either
+ * a post_id or a post_key (both unique). If a post is found, an array containing all
+ * the post information is returned. If not, a false boolean is returned.
+ *
+ * @param $post_id_or_key
+ * @return array|bool
+ */
 function get_post_info($post_id_or_key){
     $conn = get_conn();
     $queryParam = null;
@@ -416,34 +498,42 @@ function get_post_info($post_id_or_key){
         $queryParam = 'post_key';
         $bindParam = 's';
     }
+    /* Prepare statement and prevent sqlinjection */
+    if($smnt = $conn->prepare('SELECT id, title, description, likes, added, extension, post_key, user_id
+                                   FROM posts
+                                   WHERE posts.'.$queryParam.' = ? limit 1;')){
+        //Bind query parameters and execute query
+        $smnt->bind_param($bindParam, $post_id_or_key);
+        $smnt->execute();
 
-    $smnt = $conn->prepare('SELECT id, title, description, likes, added, extension, post_key, user_id
-                            FROM posts
-                            WHERE posts.'.$queryParam.' = ? limit 1;');
-    $smnt->bind_param($bindParam, $post_id_or_key);
-    $smnt->execute();
+        //Store and bind result
+        $smnt->store_result();
+        $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $user_id);
 
-    $smnt->store_result();
-    $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $user_id);
-
-    $post_array = Array();
-    if($smnt->fetch()) {
-        $post_array['id'] = $id;
-        $post_array['title'] = $title;
-        $post_array['description'] = $description;
-        $post_array['likes'] = $likes;
-        $post_array['added'] = $added;
-        $post_array['post_key'] = $post_key;
-        $post_array['extension'] = $extension;
-        $post_array['user_id'] = $user_id;
-        return $post_array;
-    }else{
-        return false;
+        $post_array = Array();
+        if($smnt->fetch()) {
+            $post_array['id'] = $id;
+            $post_array['title'] = $title;
+            $post_array['description'] = $description;
+            $post_array['likes'] = $likes;
+            $post_array['added'] = $added;
+            $post_array['post_key'] = $post_key;
+            $post_array['extension'] = $extension;
+            $post_array['user_id'] = $user_id;
+            return $post_array;
+        }else{
+            return false;
+        }
     }
 }
 
 
-
+/**
+ * This function deletes a post record from the database
+ * using either a post_id or a post_key(both unique).
+ *
+ * @param $post_id_or_key
+ */
 function delete_post($post_id_or_key){
     $conn = get_conn();
 
@@ -454,20 +544,30 @@ function delete_post($post_id_or_key){
         $queryParam = 'post_key';
     }
 
-    /* Prevent sqlinjection */
-    $stmt = $conn->prepare('DELETE FROM posts WHERE '.$queryParam.' = ?;');
-    $stmt->bind_param('i', $post_id);
+    /* Prepare statement and prevent sqlinjection */
+    if($stmt = $conn->prepare('DELETE FROM posts WHERE '.$queryParam.' = ?;')){
+        $stmt->bind_param('i', $post_id_or_key);
 
-    /* Execute prepared statement */
-    $stmt->execute();
+        /* Execute prepared statement */
+        $stmt->execute();
 
-    $conn->commit();
+        $conn->commit();
 
-    /* Close db connection and statement*/
-    $stmt->close();
-    $conn->close();
+        /* Close db connection and statement*/
+        $stmt->close();
+        $conn->close();
+    }
 }
 
+/**
+ * This function updates a post with the given post_id or post_key(both unique)
+ * and sets the title, description and tags for the updated post.
+ *
+ * @param $title
+ * @param $description
+ * @param $post_id_or_key
+ * @param $tags
+ */
 function update_post($title, $description, $post_id_or_key, $tags){
     $conn = get_conn();
 
@@ -478,7 +578,7 @@ function update_post($title, $description, $post_id_or_key, $tags){
         $queryParam = 'post_key';
     }
 
-    /* Prevent sqlinjection */
+    /* Prepare statement and prevent sqlinjection */
     $stmt = $conn->prepare('UPDATE posts SET title = ?, description = ? WHERE '.$queryParam.' = ?;');
     $stmt->bind_param('ssi', $title, $description, $post_id_or_key);
 
@@ -486,7 +586,7 @@ function update_post($title, $description, $post_id_or_key, $tags){
     $stmt->execute();
 
 
-
+    //Fetch all the current tags for the post
     if($stmt1 = $conn->prepare("SELECT * FROM post_tags WHERE post_id = ?")){
         $stmt1->bind_param('i', $post_id_or_key);
         $stmt1->execute();
@@ -500,31 +600,33 @@ function update_post($title, $description, $post_id_or_key, $tags){
             $old_tags[$id] = $tag_id;
         }
 
-
+        //Check which given tags are new so we can add them
         foreach($tags as $tag){
             if(!in_array($tag, $old_tags)){
                 $tags_to_add[] = $tag;
             }
         }
 
+        //Check which tags that are removed in the givven tag array
         foreach($old_tags as $tag){
             if(!in_array($tag, $tags)){
                 $tags_to_delete[] = $tag;
             };
         }
 
+        //Delete each tag that needs to be deleted
         foreach($tags_to_delete as $t){
             $tag_id_to_delete = array_search($t, $old_tags);
             delete_post_tag($tag_id_to_delete, $conn);
         }
 
+        //Add each tag that needs to be removed
         foreach ($tags_to_add as $t){
             add_post_tag($post_id_or_key, $t, $conn);
         }
+
+        //All the tags that were not new or removed are still in the database
     };
-
-
-
 
     $conn->commit();
 
@@ -534,84 +636,45 @@ function update_post($title, $description, $post_id_or_key, $tags){
 }
 
 /**
- * This function fetches the
+ * This function fetches all the usernames of the users who
+ * liked a post using the given post_id and joins the likes table.
+ * The usernames are them returned as json so they can be presented
+ * using an ajax(javascript) query.
  * @param $post_id
+ * @return string
  */
 function get_post_likes($post_id){
     //Get a database connection
     $conn = get_conn();
+    /* Prepare statement and prevent sqlinjection */
+    if($smnt = $conn->prepare('SELECT users.username FROM likes JOIN users ON (likes.user_id = users.id) WHERE likes.post_id = ?;')){
+        $smnt->bind_param('i', $post_id);
+        $smnt->execute();
 
-    $smnt = $conn->prepare('SELECT users.username FROM likes JOIN users ON (likes.user_id = users.id) WHERE likes.post_id = ?;');
-    $smnt->bind_param('i', $post_id);
-    $smnt->execute();
 
+        $smnt->store_result();
+        $smnt->bind_result($username);
+        $arr = Array();
+        $arr ['usernames'] = Array();
 
-    $smnt->store_result();
-    $smnt->bind_result($username);
-    $arr = Array();
-    $arr ['usernames'] = Array();
+        while($smnt->fetch()) {
+            array_push($arr['usernames'], $username);
+        }
 
-    while($smnt->fetch()) {
-        array_push($arr['usernames'], $username);
+        $json = json_encode($arr, JSON_UNESCAPED_UNICODE);
+        return $json;
     }
-
-    $json = json_encode($arr, JSON_UNESCAPED_UNICODE);
-    echo indent($json);
 }
 
 /**
- * This function fetches the latest posts from the database
- * and returns them as json to the browser.
+ * This functions first checks if a user with the given email exists
+ * then checks if a token already exists, before inserting a new
+ * token into the password_reset table. If a new token is successfully
+ * added to the database, the server should try to send an email with
+ * a reset link to the user.
+ *
+ * @param $email
  */
-function get_fresh_posts(){
-    //Get a database connection
-    $conn = get_conn();
-
-    $smnt = $conn->prepare('SELECT id, title, description, likes, added, filename, user_id FROM posts;');
-
-
-    //Execute the statement
-    $smnt->execute();
-
-    //Bind and store the result in the statement
-    $smnt->bind_result($id, $title, $description, $likes, $added, $filename, $user_id);
-    $smnt->store_result();
-
-    //Create an array for the posts with an
-    $postArr = Array();
-    $postArr['posts'] = Array();
-
-    //Loop through the results and add them to the array.
-    while($smnt->fetch()){
-        $post = new Post($id, $title, $description, $likes, $added, $filename, $user_id);
-        array_push($postArr['posts'], $post);
-    }
-
-    //Encode the array containing the posts
-    $json = json_encode($postArr);
-
-    //Echo an indented json string.
-    echo indent($json);
-}
-
-function check_account_information($email){
-    $conn = get_conn();
-
-    $stmt = $conn->prepare('SELECT id, email, username FROM USERS WHERE email = ? limit 1;');
-    $stmt->bind_param('s', $email);
-
-    $stmt->store_result();
-    $stmt->bind_result($id, $email, $username);
-
-    $arr = Array();
-    if($stmt->fetch()){
-        $arr['id'] = $id;
-        $arr['email'] = $email;
-        $arr['username'] = $username;
-    }
-    return $arr;
-}
-
 function insert_recovery_token($email){
     $conn = get_conn();
     $dateString = strtotime("+1 day");
@@ -656,7 +719,7 @@ function insert_recovery_token($email){
                 mail($dbemail,$topic,$message,$header);
                 $stmt->close();
 
-
+                //Sets unique to true to stop the loop
                 $unique = true;
             }
         }
@@ -668,10 +731,20 @@ function insert_recovery_token($email){
     $conn->close();
 }
 
+/**
+ * This functions checks the password_reset table for a
+ * record with a given token and returns true if it exists
+ * and false if it does not.
+ *
+ * @param $token
+ * @param null $conn
+ * @return bool
+ */
 function token_exists($token, $conn = null){
     if(!isset($conn)){
         $conn = get_conn();
     }
+    /* Prevent sqlinjection using prepared statement */
     $smnt = $conn->prepare('SELECT token FROM password_reset where token = ? limit 1;');
     $smnt->bind_param('s', $token);
 
@@ -686,45 +759,68 @@ function token_exists($token, $conn = null){
     }
 }
 
+/**
+ * This function selects the email and token from the password_reset table
+ * and resets the password for the user with the given email and password
+ * and updates the password_hash in the user table.
+ *
+ * @param $newPass - The new password for the user
+ * @param $token - The token connect the user with
+ */
 function reset_password($newPass, $token){
     $conn = get_conn();
-    $smnt = $conn->prepare('SELECT email, token FROM password_reset WHERE token = ? limit 1');
-    $smnt->bind_param('s', $token);
-
-    $smnt->execute();
-
-    $smnt->store_result();
-    $smnt->bind_result($email, $token);
-    if($smnt->fetch()){
-        $pwhash = password_hash($newPass, PASSWORD_BCRYPT);
-        $smnt = $conn->prepare('UPDATE users SET password_hash = ? WHERE email = ?;');
-        $smnt->bind_param('ss', $pwhash, $email);
-        $smnt->execute();
-
-        $smnt = $conn->prepare('DELETE FROM password_reset WHERE token = ?');
+    /* Prevent sqlinjection using prepared statement */
+    if($smnt = $conn->prepare('SELECT email, token FROM password_reset WHERE token = ? limit 1')){
         $smnt->bind_param('s', $token);
+
         $smnt->execute();
 
-        $smnt->close();
+        $smnt->store_result();
+        $smnt->bind_result($email, $token);
+
+        if($smnt->fetch()){
+            $pwhash = password_hash($newPass, PASSWORD_BCRYPT);
+            /* Prevent sqlinjection using prepared statement */
+            if($smnt = $conn->prepare('UPDATE users SET password_hash = ? WHERE email = ?;')){
+                $smnt->bind_param('ss', $pwhash, $email);
+                $smnt->execute();
+
+                $smnt = $conn->prepare('DELETE FROM password_reset WHERE token = ?');
+                $smnt->bind_param('s', $token);
+                $smnt->execute();
+
+                $smnt->close();
+            }
+        }
     }
 }
 
+/**
+ * This function gets post info for a single post and gets the posts before
+ * and after the post that is found using the post_key. Returns an array
+ * containing all the post info and the post_key of the post before and after
+ * to link to previous and next post.
+ *
+ * @param $post_key
+ * @return array
+ */
 function get_posts_before_and_after($post_key){
     $conn = get_conn();
     $user_id = (isset($_SESSION['id']) ? $_SESSION['id'] : 0);
 
-
+    /* Prevent sqlinjection using prepared statement */
     $smnt = $conn->prepare('SELECT posts.id, posts.title, posts.description, posts.likes, posts.favourites, posts.added, posts.extension, posts.post_key, posts.user_id, likes.user_id, favourites.user_id
-                            FROM posts
-                            LEFT JOIN likes ON (likes.post_id = posts.id AND likes.user_id = ?)
-                            LEFT JOIN favourites ON (favourites.post_id = posts.id AND favourites.user_id = ?)
-                            WHERE posts.post_key = ? limit 1;');
+                                   FROM posts
+                                   LEFT JOIN likes ON (likes.post_id = posts.id AND likes.user_id = ?)
+                                   LEFT JOIN favourites ON (favourites.post_id = posts.id AND favourites.user_id = ?)
+                                   WHERE posts.post_key = ? limit 1;');
     $smnt->bind_param('iis', $user_id, $user_id, $post_key);
     $smnt->execute();
 
     $smnt->bind_result($id, $title, $description, $likes, $favourites, $added, $extension, $post_key, $user_id, $liked, $is_favourite);
 
     if($smnt->fetch()) {
+        //TODO Create an object instead
         $currentId = $id;
         $post_arr = Array();
         $post_arr['id'] = $id;
@@ -742,6 +838,7 @@ function get_posts_before_and_after($post_key){
         $smnt->close();
 
         //Fetch the post before
+        /* Prevent sqlinjection using prepared statement */
         if($smnt1 = $conn->prepare('SELECT post_key FROM posts where id < ? order by id desc limit 1;')) {
 
             $smnt1->bind_param('i', $currentId);
@@ -779,6 +876,16 @@ function get_posts_before_and_after($post_key){
     }
 }
 
+/**
+ * This function inserts a new comment into the database using the
+ * given post_key. If the insert is successful, a true boolean and
+ * a comment object is returned on an array.
+ *
+ * @param $post_key
+ * @param $comment
+ * @param $parent_id
+ * @return array|bool
+ */
 function insert_comment($post_key, $comment, $parent_id){
     $conn = get_conn();
     $now = date("Y-m-d H:i:s");
@@ -793,15 +900,24 @@ function insert_comment($post_key, $comment, $parent_id){
 
             return [true, new Comment($insertedId,$comment, $user_id, $now, $parsed_parent_id, $post_key, $username, $avatar)];
         }else{
-            var_dump($conn->error);
+            //var_dump($conn->error);
             return false;
         }
     }else{
-        var_dump($conn->error);
+        //var_dump($conn->error);
         return false;
     }
 }
 
+/**
+ * This function fetches all the comments for a post and
+ * adds them all to a list. Once they are in a list, the child
+ * comments are added to their parents child_array and then removed
+ * from the first list. This is to create a nested comment tree structure.
+ *
+ * @param $post_key
+ * @return array|bool
+ */
 function get_post_comments($post_key){
     $conn = get_conn();
     if($smnt = $conn->prepare('SELECT comments.id, comments.text, comments.user_id, comments.time, comments.parent_id, comments.post_key, users.username, users.avatar
@@ -820,25 +936,36 @@ function get_post_comments($post_key){
             $comment_arr[$id] = new Comment($id, $text, $user_id, $time, $parent_id, $post_key, $username, $avatar);
         }
 
+        //Adds all the child comments to its parent child list
         foreach ($comment_arr as $com) {
             if ($com->parent_id != 0) {
                 $comment_arr[$com->parent_id]->children[] = $com;
             }
         }
 
+        //Remove all the child comments
         foreach ($comment_arr as $com) {
             if ($com->parent_id != 0) {
                 unset($comment_arr[$com->id]);
             }
         }
 
+        //
         return $comment_arr;
     }else{
         return false;
     }
 }
 
-
+/**
+ * This function inserts a new avatar to the avatar table in the database,
+ * and returns true if successful and false if not.
+ *
+ * @param $avatar_key
+ * @param $extension
+ * @param $user_id
+ * @return bool
+ */
 function insert_new_avatar($avatar_key, $extension, $user_id){
     $conn = get_conn();
 
@@ -865,6 +992,14 @@ function insert_new_avatar($avatar_key, $extension, $user_id){
     /* Close db connection and statement*/
 }
 
+
+/**
+ * This function gets all the all the avatars from the avatars table and returns
+ * them as objects in an array.
+ *
+ * @param $user_id
+ * @return array
+ */
 function get_user_avatars($user_id){
     $conn = get_conn();
 
@@ -885,7 +1020,15 @@ function get_user_avatars($user_id){
 
 }
 
-
+/**
+ * This function updates the current avatar for a user
+ * in the avatar table and returns true if successful, an
+ * false if not.
+ *
+ * @param $user_id
+ * @param $avatar
+ * @return bool
+ */
 function update_user_avatar($user_id, $avatar){
     $conn = get_conn();
 
@@ -907,6 +1050,13 @@ function update_user_avatar($user_id, $avatar){
     }
 }
 
+/**
+ * This function fetches all the favourites of a user and echo's them
+ * on the index page as paragraphs.
+ *
+ * //TODO should just get the favourites and not echo them - seperate functionality
+ * @return bool
+ */
 function echo_user_favourites(){
     $conn = get_conn();
     $user_id = $_SESSION['id'];
@@ -935,6 +1085,15 @@ function echo_user_favourites(){
     }
 }
 
+/**
+ * This function gets all the current post tags for a given post
+ * and returns them as an array of arrays.
+ *
+ * @param $post_id
+ * @param bool $ids_only
+ * @param null $con
+ * @return array
+ */
 function get_post_tags($post_id, $ids_only = true, $con = null){
     $conn = (isset($con) ? $con : get_conn());
 
@@ -961,6 +1120,13 @@ function get_post_tags($post_id, $ids_only = true, $con = null){
     return $results;
 }
 
+/**
+ * This function fetches all the tags and echo's them. If
+ * the selected parameter is given, the tags in the selected
+ * array will be checked.
+ *
+ * @param array $selected
+ */
 function echo_tags($selected = Array()){
     $conn = get_conn();
 
@@ -976,9 +1142,14 @@ function echo_tags($selected = Array()){
     }
 }
 
+/**
+ * This function fetches and echo's all the
+ * tahs for a single post.
+ *
+ * @param $post_id
+ */
 function echo_post_tags($post_id){
     $tags = get_post_tags($post_id, false);
-
     foreach($tags as $tag){
         $id = $tag['id'];
         $name = $tag['tag_name'];
@@ -986,23 +1157,38 @@ function echo_post_tags($post_id){
     }
 }
 
+/**
+ * This function deletes a single post tag from a post.
+ *
+ * @param $tag_id
+ * @param null $con
+ */
 function delete_post_tag($tag_id, $con = null){
     $conn = (isset($con) ? get_conn() : $con);
 
     /* Prevent sqlinjection */
-    $stmt = $conn->prepare('DELETE FROM post_tags WHERE id = ?;');
-    $stmt->bind_param('i', $tag_id);
+    if($stmt = $conn->prepare('DELETE FROM post_tags WHERE id = ?;')){
+        $stmt->bind_param('i', $tag_id);
 
-    /* Execute prepared statement */
-    $stmt->execute();
+        /* Execute prepared statement */
+        $stmt->execute();
 
-    $conn->commit();
+        $conn->commit();
 
-    /* Close db connection and statement*/
-    $stmt->close();
-    $conn->close();
+        /* Close db connection and statement*/
+        $stmt->close();
+        $conn->close();
+    }
 }
 
+/**
+ *
+ * This function adds a new post tag to the database.
+ *
+ * @param $post_id - The post id to link a tag
+ * @param $tag_id - The tag id to link a post_tag
+ * @param null $con - Optional database connection
+ */
 function add_post_tag($post_id, $tag_id, $con = null){
     $conn = (isset($con) ? get_conn() : $con);
 
@@ -1020,45 +1206,45 @@ function add_post_tag($post_id, $tag_id, $con = null){
     $conn->close();
 }
 
-function search($query , $con = null){
+
+/**
+ *
+ * This function searches through the database for
+ * posts that matches on either their tags containing
+ * the search query or their title and returns
+ * a list of post objects.
+ *
+ * @param $query - The search query from the user
+ * @param null $con - optional connection
+ * @return array - An array of post objects
+ */
+function search($query, $con = null){
+    //Use the give connection or get another one
     $conn = (isset($con) ? $con : get_conn());
     $logged_in_user_id = (isset($_SESSION['id']) ? $_SESSION['id'] : '');
 
     $posts = Array();
     $param = "%$query%";
-    if($stmt = $conn->prepare("SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, posts.user_id, likes.user_id, favourites.user_id 
-                                      FROM posts 
+    if($stmt = $conn->prepare("SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, posts.user_id, likes.user_id, favourites.user_id
+                                      FROM post_tags
+                                      JOIN tags ON  post_tags.tag_id = tags.id
+                                      JOIN posts ON  (post_tags.post_id = posts.id OR posts.title LIKE ?)
                                       JOIN users ON (posts.user_id = users.id ) 
                                       LEFT JOIN likes ON (likes.user_id = ? AND posts.id = likes.post_id)
                                       LEFT JOIN favourites ON (favourites.user_id = ? AND posts.id = favourites.post_id)
-                                      WHERE title LIKE ?;")){
-        $stmt->bind_param('iis', $logged_in_user_id,$logged_in_user_id,$param);
+                                      WHERE posts.title LIKE ? OR tags.tag_name LIKE ?;")){
+        $stmt->bind_param('siiss', $param, $logged_in_user_id, $logged_in_user_id, $param, $param);
         $stmt->execute();
         $stmt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $user_id, $liked_id, $favourite_id);
         while($stmt->fetch()){
-            $posts[$id] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $username, $liked_id, $favourite_id);
-        }
-    }
-
-
-    if($stmt1 = $conn->prepare("SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, posts.user_id, likes.user_id, favourites.user_id
-                                       FROM post_tags
-                                       JOIN tags ON  post_tags.tag_id = tags.id
-                                       JOIN posts ON  post_tags.post_id = posts.id
-                                       JOIN users ON (posts.user_id = users.id ) 
-                                       LEFT JOIN likes ON (likes.user_id = ? AND posts.id = likes.post_id)
-                                       LEFT JOIN favourites ON (favourites.user_id = ? AND posts.id = favourites.post_id)
-                                       WHERE tags.tag_name LIKE ?;")){ //LIMIT 10 OFFSET ? TODO
-        $stmt1->bind_param('iis', $logged_in_user_id,$logged_in_user_id,$param);
-        $stmt1->execute();
-        $stmt1->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $user_id, $liked_id, $favourite_id);
-        while($stmt1->fetch()){
-            if(!array_key_exists($id, $posts)) {
+            if(!array_key_exists($id, $posts)){
                 $posts[$id] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $username, $liked_id, $favourite_id);
             }
         }
     }
     return $posts;
 }
+
+
 
 ?>

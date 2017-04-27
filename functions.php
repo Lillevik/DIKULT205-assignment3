@@ -1,28 +1,31 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: goat
- * Date: 14/01/17
- * Time: 16:16
+ * This function echo's some general metadata tags.
+ * charset, viewport and icon
  */
-
-
 function echo_metadata(){
     echo
     "<meta charset=\"utf-8\">
      <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-     <link rel='icon' href='./images/logo.svg'>";
+     <link rel='icon' href='./images/logo.png'>";
 }
 
+/**
+ * This functions echo's the navigation markup.
+ * It should be placed within a <header> element.
+ */
 function get_navigation(){
     $domain = get_domain();
+
+    //Gets the session variables, username and avatar
     $username = (isset($_SESSION['username']) ? $_SESSION['username'] : null);
     $avatar = (!empty($_SESSION['avatar']) ? './avatars/' . $_SESSION['avatar'] : './images/profile.png');
     echo
         "<nav>
             <ul class='menulist'>
                 <li class='menuitem'><a href='$domain/' class='menulink'>Home</a></li>
-                <li class='menuitem'><a href='$domain/new_post.php' class='menulink newpost'>New post<i class='fa fa-plus-square-o' aria-hidden='true'></i></a></li>"
+                <li class='menuitem'><a href='$domain/new_post.php' class='menulink newpost'>New post<i class='fa fa-plus-square-o' aria-hidden='true'></i></a></li>
+           "
                 . (isset($_SESSION['logged_in']) ?
 
 
@@ -32,15 +35,27 @@ function get_navigation(){
                         <li class='droplist-item'><a href='./profile.php' class='menulink-dropdown'>Profile</a></li>
                         <li class='droplist-item'><a href='./logout.php' class='menulink-dropdown'>Logout</a></li>
                     </ul>
-                </li>" :
+                </li>
+                <li class='rightmenuitem'><input type='search' placeholder='Titles and tags..'></li>" :
 
                "<li class='rightmenuitem'><a href='$domain/login.php' class='menulink'>Login</a></li>" .
-               "<li class='rightmenuitem'><a href='$domain/register.php' class='menulink'>Register</a></li>") .
+               "<li class='rightmenuitem'><a href='$domain/register.php' class='menulink'>Register</a></li>
+                <li class='rightmenuitem'>
+                    <form id='search-form' name='search-form' action='./index.php' method='post'>
+                        <input type='search' name='search-input' placeholder='Titles and tags..'>
+                        <input type='submit' value='search'>
+                    </form>
+                </li>") .
            "</ul>
         </nav>";
 }
 
 
+/**
+ * This function checks if a users is logged
+ * in and returns them to the login page if
+ * they are not.
+ */
 function check_user_logged_in(){
     if(!isset($_SESSION['logged_in'])){
         header('Location: ./login.php?access=denied');

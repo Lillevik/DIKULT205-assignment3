@@ -8,6 +8,12 @@
 session_start();
 include 'dbHandling.php';
 include_once 'functions.php';
+
+if($_SERVER["REQUEST_METHOD"] == "POST"){
+    $query = (isset($_POST["search-input"]) ? $_POST["search-input"] : '');
+    header("Location: ./index.php?query=$query");
+    exit();
+}
 ?>
 
 
@@ -19,13 +25,12 @@ include_once 'functions.php';
             echo_metadata();
         ?>
         <title>Picstr</title>
-        <link rel="icon" type="image/svg+xml" href="./images/logo.svg">
         <link href="https://use.fontawesome.com/db87107c26.css" media="all" rel="stylesheet">
 
         <link rel="stylesheet" href="css/menu.css">
         <link rel="stylesheet" href="css/index.css">
         <script type="text/javascript" src="./js/jquery.js"></script>
-        <script type="text/javascript" src="./config.js"></script>
+        <script type="text/javascript" src="./js/config.js"></script>
         <script type="text/javascript" src="./js/likes.js"></script>
         <script type="text/javascript" src="./js/favourite.js"></script>
         <script type="text/javascript" src="./js/script.js"></script>

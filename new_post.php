@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     } else {
 
         if (move_uploaded_file($_FILES["file-upload"]["tmp_name"], $target_dir . $filename)) {
-                insert_new_image($title, $description,$filename, $_SESSION['id'], $tags);
+                insert_new_post($title, $description,$filename, $_SESSION['id'], $tags);
                 header('Location:./edit_post.php?post=' . $filestring . '&uploadSuccess=true');
                 exit();
         } else {

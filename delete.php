@@ -44,12 +44,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         <link rel="stylesheet" href="./css/delete.css" type="text/css">
     </head>
     <body>
-
+        <!-- Delete post form-->
         <form action="delete.php?post=<?php echo $id ?>" method="POST">
             <img id="preview-image" src="./uploadsfolder/<?php echo $post_key . $extension;?>"
             <label for="submit">Are you sure you wish to delete this post?</label>
             <input type="submit" name="submit" id="submit" value="Yes">
-            <a href="edit_post.php?post=<?php echo $id ?>"><input type="button" value="No"></a>
+            <a href="edit_post.php?post=<?php echo $id ?>">
+                <input type="button" value="No">
+            </a>
         </form>
     </body>
 </html>

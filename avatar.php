@@ -9,7 +9,7 @@ include 'dbHandling.php';
 include 'image_resizing.php';
 session_start();
 check_user_logged_in();
-//header("Location: /success?upload=true");
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     $domain = get_domain();
     $user_id =$_SESSION['id'];
@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
                 array_push($err_arr, "<p class='error-message'>Sorry, your avatar was not updated.</p>");
             }
 
-            // if everything is ok, try to upload file
+        // if everything is ok, try to upload file
         } else {
 
             if (move_uploaded_file($_FILES["inputFile"]["tmp_name"], $target_dir . $filename)) {

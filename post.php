@@ -36,7 +36,7 @@ $url = $post['post_key'] . $post['extension'];
 
 
     <script src="./js/jquery.js"></script>
-    <script src="./config.js"></script>
+    <script src="js/config.js"></script>
     <script src="./js/post.js"></script>
     <script src="./js/likes.js"></script>
     <script src="./js/favourite.js"></script>
