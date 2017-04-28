@@ -4,6 +4,7 @@ body{
     background:rgba(213,243,255,0.96);
     overflow: auto;
     min-height: calc(100vh - 34px);
+    height: 100%;
 }
 
 header{

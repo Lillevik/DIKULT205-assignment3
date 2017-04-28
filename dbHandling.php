@@ -8,7 +8,7 @@
 require 'password.php';
 include_once 'functions.php';
 include 'config.php';
-include get_connect_path();
+include __dir__ . "/" .get_connect_path();
 
 
 /**
@@ -156,6 +156,7 @@ class Avatar{
  * @param $email
  * @param $username
  * @param $password
+ * @return bool
  */
 function insert_new_user($email, $username, $password){
     $conn = get_conn();
@@ -304,9 +305,10 @@ function insert_new_post($title, $description, $filename, $userid, $tags){
  *
  * @param $offset
  * @param string $searchQuery
+ * @param string $tagSearch
  * @return array
  */
-function get_posts($offset, $searchQuery = ''){
+function get_posts($offset, $searchQuery = '', $tagSearch = ''){
     $conn = get_conn();
     $offset = ($offset - 1) * 10;
     $logged_in_user_id = (isset($_SESSION['id']) ? $_SESSION['id'] : '');
@@ -315,6 +317,8 @@ function get_posts($offset, $searchQuery = ''){
     /* Search for posts if query is give or fetches after offset if not */
     if(!empty($searchQuery)){
         $posts = search($searchQuery, $conn);
+    }else if(!empty($tagSearch)){
+        $posts = get_posts_by_tag_name($tagSearch, $conn);
     }else{
         /* Prepare statement to prevent sqlinjection */
         $smnt = $conn->prepare('SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, posts.user_id, likes.user_id, favourites.user_id
@@ -606,14 +610,14 @@ function update_post($title, $description, $post_id_or_key, $tags){
             $old_tags[$id] = $tag_id;
         }
 
-        //Check which given tags are new so we can add them
+        //Check which given tags are new so they can be added
         foreach($tags as $tag){
             if(!in_array($tag, $old_tags)){
                 $tags_to_add[] = $tag;
             }
         }
 
-        //Check which tags that are removed in the givven tag array
+        //Check which tags that are removed in the given tag array
         foreach($old_tags as $tag){
             if(!in_array($tag, $tags)){
                 $tags_to_delete[] = $tag;
@@ -1105,9 +1109,9 @@ function get_post_tags($post_id, $ids_only = true, $con = null){
 
     $results = Array();
     if($smnt = $conn->prepare("SELECT tags.id, tags.tag_name 
-                                        FROM post_tags 
-                                        JOIN tags ON (post_tags.tag_id = tags.id)
-                                        WHERE post_tags.post_id = ?;")){
+                                      FROM post_tags 
+                                      JOIN tags ON (post_tags.tag_id = tags.id)
+                                      WHERE post_tags.post_id = ?;")){
         $smnt->bind_param('i', $post_id);
         $smnt->execute();
         $smnt->bind_result($tag_id, $name);
@@ -1146,6 +1150,30 @@ function echo_tags($selected = Array()){
               <label for='$id' class='tag-label'>$tag_name</label>";
         }
     }
+}
+
+/**
+ * This function fetches all the tags
+ * from the tags table and returns them
+ * as an Array of Arrays.
+ *
+ * @return array
+ */
+function get_tags(){
+    $conn = get_conn();
+    $results = [];
+    if($smnt = $conn->prepare("SELECT * FROM tags;")){
+        $smnt->execute();
+        $smnt->bind_result($id, $tag_name);
+
+        while($smnt->fetch()){
+            $tag_arr = Array();
+            $tag_arr['id'] = $id;
+            $tag_arr['tag_name'] = $tag_name;
+            $results[] = $tag_arr;
+        }
+    }
+    return $results;
 }
 
 /**
@@ -1249,6 +1277,41 @@ function search($query, $con = null){
         }
     }
     return $posts;
+}
+
+/**
+ * This function fetches all the posts that have
+ * a tag matching the given parameter tag_name.
+ * Returns a list of posts objects.
+ *
+ * @param $tag_name
+ * @param null $con
+ * @return array
+ */
+function get_posts_by_tag_name($tag_name, $con = null){
+    //Use the give connection or get another one
+    $conn = (isset($con) ? $con : get_conn());
+    $logged_in_user_id = (isset($_SESSION['id']) ? $_SESSION['id'] : '');
+
+    $posts = Array();
+    if($stmt = $conn->prepare("SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, posts.user_id, likes.user_id, favourites.user_id
+                                      FROM post_tags
+                                      JOIN tags ON  post_tags.tag_id = tags.id
+                                      JOIN posts ON  (post_tags.post_id = posts.id)
+                                      JOIN users ON (posts.user_id = users.id ) 
+                                      LEFT JOIN likes ON (likes.user_id = ? AND posts.id = likes.post_id)
+                                      LEFT JOIN favourites ON (favourites.user_id = ? AND posts.id = favourites.post_id)
+                                      WHERE tags.tag_name = ?")){
+        $stmt->bind_param('iis',  $logged_in_user_id, $logged_in_user_id, $tag_name);
+        $stmt->execute();
+        $stmt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $user_id, $liked_id, $favourite_id);
+        while($stmt->fetch()){
+            $posts[$id] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $username, $liked_id, $favourite_id);
+
+        }
+    }
+    return $posts;
+
 }
 
 

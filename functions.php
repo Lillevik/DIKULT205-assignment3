@@ -27,6 +27,7 @@ function get_navigation(){
                 <li class='menuitem'><a href='./' class=''><img src='./images/logo.png' id='menu-logo'></a></li>
                 <li class='menuitem'><a href='./new_post.php' class='menulink newpost'>New post<i class='fa fa-plus-square-o' aria-hidden='true'></i></a></li>
            "
+                //If the user is logged in
                 . (isset($_SESSION['logged_in']) ?
 
 
@@ -37,7 +38,7 @@ function get_navigation(){
                     </div>
                     <ul class='droplist'>
                         <li class='droplist-item'><a href='./profile.php' class='menulink-dropdown'>Profile</a></li>
-                        <li class='droplist-item'><a href='./logout.php' class='menulink-dropdown'>Logout</a></li>
+                        <li class='droplist-item'><a href='./login.php?logout=true' class='menulink-dropdown'>Logout</a></li>
                     </ul>
                 </li>
                 <li class='rightmenuitem'>
@@ -46,7 +47,9 @@ function get_navigation(){
                         <label for='submit-search'><i class=\"fa fa-search\" aria-hidden=\"true\"></i></label>
                         <input type='submit' value='search' id='submit-search'>
                     </form>
-                </li>" :
+                </li>"
+                //If the user is not logged in
+                :
 
                "<li class='rightmenuitem'><a href='./login.php' class='menulink'>Login</a></li>" .
                "<li class='rightmenuitem'><a href='./register.php' class='menulink'>Register</a></li>

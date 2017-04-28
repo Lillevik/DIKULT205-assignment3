@@ -33,10 +33,12 @@ window.onscroll = function() {
 window.onload = function(){
     var main = $('main');
     var footer = $('footer');
-    if(main.height() < window.innerHeight){
+    var rightCon = $('#right-container');
+    if((main.height() + footer.height()) < window.innerHeight){
         footer.css("position", "absolute");
-        footer.css("bottom", "0")
-        $('#right-container').css('display', 'none')
+        footer.css("bottom", "0");
+        rightCon.css({'position':'absolute','right':'0', 'z-index':999, 'top':'-43px'})
+
     }
 };
 

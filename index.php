@@ -39,8 +39,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
             <?php
             $query = (isset($_GET['query']) ? $_GET['query'] : '');
+            $tagQuery = (isset($_GET['category']) ? $_GET['category'] : '');
             $page = (isset($_GET['page']) ? intval($_GET['page']) : 1);
-            $results = get_posts($page, $query);
+            $results = get_posts($page, $query, $tagQuery);
             $posts = $results['posts'];
 
             if(!empty($query)){
@@ -75,9 +76,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     <section id="popular-categories" class="right-section">
                         <h1>Categories</h1>
                         <ul class="right-list">
-                            <li class="right-list-item">
-                                Work in progress..
-                            </li>
+                            <?php
+                                $tags = get_tags();
+                                foreach($tags as $tag){
+                                    echo "<li class='category-link'>
+                                              <a href='./index.php?category={$tag['tag_name']}'>{$tag['tag_name']}</a>
+                                          </li>";
+                                }
+                            ?>
+
                         </ul>
                     </section>
                 </div>
