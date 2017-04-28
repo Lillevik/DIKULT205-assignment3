@@ -5,12 +5,7 @@ main{
     justify-content: center;
     max-width: 100%;
     position: relative;
-}
-
-footer{
-    min-height: 300px;
-    width: 100vw;
-    background:#333;
+    padding-top:20px;
 }
 
 #post-container{

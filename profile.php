@@ -14,7 +14,7 @@ check_user_logged_in();
 <html>
 
 <head>
-    <link rel="stylesheet" href="css/menu.css">
+    <?php echo_metadata() ?>
     <link rel="stylesheet" href="./css/index.css">
 </head>
 

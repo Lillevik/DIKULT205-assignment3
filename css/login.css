@@ -14,6 +14,7 @@ input{
     appearance:none;
 }
 
+
 #loginform{
     width: 300px;
     margin: 20vh auto 0;
@@ -68,7 +69,7 @@ label[for='submit']{
     float: left;
     margin-left:15px;
     margin-top:10px;
-    padding:5px;
+    padding: 5px 5px 5px 0;
 }
 
 #wronginfo{
@@ -87,15 +88,9 @@ label[for='submit']{
     overflow: auto;
 }
 
-#backtofrontpage{
-
-}
-
 #forgotPass{
     display: block;
     float: left;
     margin-left:15px;
-    margin-top:10px;
-    padding:5px;
-    margin-top:0px;
+    padding: 5px 20px 5px 0;
 }

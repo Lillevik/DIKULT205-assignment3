@@ -30,4 +30,14 @@ window.onscroll = function() {
 	}
 };
 
+window.onload = function(){
+    var main = $('main');
+    var footer = $('footer');
+    if(main.height() < window.innerHeight){
+        footer.css("position", "absolute");
+        footer.css("bottom", "0")
+        $('#right-container').css('display', 'none')
+    }
+};
+
 

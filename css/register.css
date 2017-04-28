@@ -1,29 +1,7 @@
-html{
-    min-height:100vh;
-    background-color: #f5f6fa;
-}
-
-text, p, label, span, input, a{
-    font-size: 12px;
-    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-}
-
-ul{
-    width:270px;
-    max-width: 100%;
-    padding: 0;
-    margin: 10px auto 0;
-}
-li{
-    display: inline-block;
-    width: 32%;
-}
-
 /* Styles the register form */
 #registerform{
     width: 300px;
     max-width: 100%;
-    border: 1px solid silver;
     border-radius:2px;
     padding-bottom:15px;
     -webkit-box-shadow: 0px 0px 30px -4px rgba(153,133,153,1);
@@ -37,7 +15,7 @@ li{
 
 /* Resets default appearances */
 
-input[type='submit']{
+#register-button{
     -webkit-appearance: none;
     -moz-appearance:none;
     appearance:none;
@@ -48,13 +26,10 @@ input[type='submit']{
     width:270px;
     display: block;
     padding:5px;
-    border: 2px solid grey;
+    border: 2px solid silver;
     border-radius:2px;
     margin: 0 auto 10px;
     max-width: 90%;
-    -webkit-box-shadow: inset 0px 0px 2px 0px rgba(0,0,0,0.75);
-    -moz-box-shadow: inset 0px 0px 2px 0px rgba(0,0,0,0.75);
-    box-shadow: inset 0px 0px 2px 0px rgba(0,0,0,0.75);
 }
 
 .writteninput:focus{

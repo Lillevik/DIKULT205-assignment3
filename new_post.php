@@ -8,8 +8,8 @@
 
 session_start();
 include 'functions.php';
-
-check_user_logged_in();
+$url = $_SERVER['REQUEST_URI'];
+check_user_logged_in($url);
 
 include 'dbHandling.php';
 include 'image_resizing.php';
@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="css/menu.css">
+        <?php echo_metadata()?>
         <link rel="stylesheet" href="css/newpost.css">
         <script type="text/javascript" src="js/jquery.js"></script>
         <script src="https://cloud.tinymce.com/stable/tinymce.min.js?apiKey=vnl5crhqxbrkolf8f9f8yce1ni48ud128eyl9624aw0r22n9"></script>
@@ -151,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
                 ?>
 
                 <section id="buttons">
-                    <input type="submit" value="Publish">
+                    <input type="submit" class="sub-form-button" value="Publish">
                 </section>
             </form>
 
@@ -213,5 +213,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
                 });
             </script>
         </main>
+        <?php echo_footer() ?>
     </body>
 </html>

@@ -1,9 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * Date: 14/01/17
- * Time: 02:34
- */
+$returnUrl = (isset($_GET["returnUrl"])? $_GET["returnUrl"]:"./");
+
 if($_SERVER["REQUEST_METHOD"] == "POST") {
     include 'dbHandling.php';
     $email = (isset($_POST['email']) ? $_POST['email'] : '');
@@ -11,30 +8,36 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if(!empty($email) and !empty($password)){
         if(validate_login($email, $password)){
-            header('Location: ./');
+            header("Location: " . $returnUrl);
             exit();
         }else{
-            $wrongPass = true;
+            header("Location:./login.php?wrongPass=true&returnUrl=$returnUrl");
+            exit();
         }
     }else{
-        $required = true;
+        header("Location:./login.php?required=true&returnUrl=$returnUrl");
+        exit();
     }
 }else if($_SERVER["REQUEST_METHOD"] == "GET"){
     require "functions.php";
 }
 
+$wrongPass = (isset($_GET['wrongPass'])?$_GET['wrongPass']:null);
+$required = (isset($_GET['required'])?$_GET['required']:null);
 
 ?>
 
-<head>
-    <?php echo_metadata() ?>
-    <link rel="stylesheet" href="css/login.css">
-</head>
 <body>
+    <head>
+        <?php echo_metadata() ?>
+        <link rel="stylesheet" href="css/login.css">
+    </head>
+    <header>
+        <?php get_navigation() ?>
+    </header>
     <main>
-        <a href="./" id="backtofrontpage">To the frontpage</a>
-        <form action="./login.php" method="POST" id="loginform">
-            <label for="email" class="inputlabel">Username or email<input type="text" class="writteninput" id="email" name="email" placeholder="Username or email" title="Enter username or email" value="<?php echo (isset($email) ? $email : '');?>"></label>
+        <form action="./login.php?returnUrl=<?php echo $returnUrl?>" method="POST" id="loginform">
+            <label for="email" class="inputlabel">Username or email<input type="text" class="writteninput" id="email" name="email" placeholder="Username or email" title="Enter username or email" value="<?php echo (isset($email) ? $email : '')?>"></label>
             <label for="password" class="inputlabel">Password<input type="password" class="writteninput" id="password" name="password" placeholder="Password" title="Enter password here"></label>
             <label for="submit">Need an <a href="./register.php">account?</a></label><input type="submit" id="submit" value="Login">
             <?php if (isset($wrongPass)){

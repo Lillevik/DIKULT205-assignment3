@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="css/menu.css">
+        <?php echo_metadata() ?>
         <link rel="stylesheet" href="css/newpost.css">
         <script type="text/javascript" src="js/jquery.js"></script>
         <script src="https://cloud.tinymce.com/stable/tinymce.min.js?apiKey=vnl5crhqxbrkolf8f9f8yce1ni48ud128eyl9624aw0r22n9"></script>
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         <header>
             <?php get_navigation(); ?>
         </header>
-        <form action="edit_post.php?post=<?php echo $id ?>" method="POST" enctype="multipart/form-data">
+        <form action="edit_post.php?post=<?php echo $id ?>" id="post-form" method="POST" enctype="multipart/form-data">
             <?php
             if($uploadSuccess){
                 echo '<p>Post was successful.</p>';
@@ -76,8 +76,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
             <?php echo_tags(get_post_tags($post_id_or_key))?>
             <section id="buttons">
                 <a href="./delete.php?post=<?php echo $id ?>"><button type="button" id="delete-button">Delete</button></a>
-                <input type="submit" value="Update">
+                <input type="submit" class="sub-form-button" value="Update">
             </section>
         </form>
+        <?php echo_footer() ?>
     </body>
 </html>

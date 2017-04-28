@@ -21,20 +21,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <html>
 
     <head>
-        <?php
-            echo_metadata();
-        ?>
-        <title>Picstr</title>
-        <link href="https://use.fontawesome.com/db87107c26.css" media="all" rel="stylesheet">
-
-        <link rel="stylesheet" href="css/menu.css">
+        <?php echo_metadata(); ?>
         <link rel="stylesheet" href="css/index.css">
         <script type="text/javascript" src="./js/jquery.js"></script>
         <script type="text/javascript" src="./js/config.js"></script>
         <script type="text/javascript" src="./js/likes.js"></script>
         <script type="text/javascript" src="./js/favourite.js"></script>
         <script type="text/javascript" src="./js/script.js"></script>
-
     </head>
 
     <body>
@@ -43,7 +36,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         </header>
 
 
-        <section id="search-results">
+
             <?php
             $query = (isset($_GET['query']) ? $_GET['query'] : '');
             $page = (isset($_GET['page']) ? intval($_GET['page']) : 1);
@@ -51,12 +44,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             $posts = $results['posts'];
 
             if(!empty($query)){
+                echo "<section id=\"search-results\">";
                 $numberOfResults = count($posts);
                 echo "<h2>You searched for: $query</h2>";
                 echo "Total results: $numberOfResults";
+                echo "</section>";
             }
             ?>
-        </section>
+
         <main>
 
             <div id="post-container">
@@ -134,8 +129,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         </section>
 
 
-        <footer>
-
-        </footer>
+        <?php echo_footer() ?>
     </body>
 </html>

@@ -1,11 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: goat
- * Date: 13/01/17
- * Time: 21:31
- */
+include 'functions.php';
 ?>
-
+<head>
+    <?php echo_metadata()?>
+</head>
+<header>
+    <?php get_navigation()?>
+</header>
 <p>Success!</p>
 <p>Click <a href="./">here</a> to get to the frontpage.</p>

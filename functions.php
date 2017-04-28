@@ -3,11 +3,14 @@
  * This function echo's some general metadata tags.
  * charset, viewport and icon
  */
-function echo_metadata(){
+function echo_metadata($title = "Picstr"){
     echo
     "<meta charset=\"utf-8\">
      <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-     <link rel='icon' href='./images/logo.png'>";
+     <link rel='icon' href='./images/logo.png'>
+     <link href=\"https://use.fontawesome.com/db87107c26.css\" media=\"all\" rel=\"stylesheet\">
+     <link rel='stylesheet' href='./css/menu.css'>
+     <title>$title</title>";
 }
 
 /**
@@ -15,39 +18,61 @@ function echo_metadata(){
  * It should be placed within a <header> element.
  */
 function get_navigation(){
-    $domain = get_domain();
-
     //Gets the session variables, username and avatar
     $username = (isset($_SESSION['username']) ? $_SESSION['username'] : null);
     $avatar = (!empty($_SESSION['avatar']) ? './avatars/' . $_SESSION['avatar'] : './images/profile.png');
     echo
         "<nav>
             <ul class='menulist'>
-                <li class='menuitem'><a href='$domain/' class='menulink'>Home</a></li>
-                <li class='menuitem'><a href='$domain/new_post.php' class='menulink newpost'>New post<i class='fa fa-plus-square-o' aria-hidden='true'></i></a></li>
+                <li class='menuitem'><a href='./' class=''><img src='./images/logo.png' id='menu-logo'></a></li>
+                <li class='menuitem'><a href='./new_post.php' class='menulink newpost'>New post<i class='fa fa-plus-square-o' aria-hidden='true'></i></a></li>
            "
                 . (isset($_SESSION['logged_in']) ?
 
 
-                "<li class='rightmenuitem' id='dropdown'><a href='$domain/profile.php' class='menulink' id='profile-list-element'>
-                <img id='profile-avatar' src='$avatar'><span id='username'>$username</span></a>
+                "<li class='rightmenuitem' id='dropdown'>
+                    <div class='menulink' id='profile-list-element'>
+                        <img id='profile-avatar' src='$avatar'>
+                        <span id='username'>$username</span>
+                    </div>
                     <ul class='droplist'>
                         <li class='droplist-item'><a href='./profile.php' class='menulink-dropdown'>Profile</a></li>
                         <li class='droplist-item'><a href='./logout.php' class='menulink-dropdown'>Logout</a></li>
                     </ul>
                 </li>
-                <li class='rightmenuitem'><input type='search' placeholder='Titles and tags..'></li>" :
-
-               "<li class='rightmenuitem'><a href='$domain/login.php' class='menulink'>Login</a></li>" .
-               "<li class='rightmenuitem'><a href='$domain/register.php' class='menulink'>Register</a></li>
                 <li class='rightmenuitem'>
                     <form id='search-form' name='search-form' action='./index.php' method='post'>
-                        <input type='search' name='search-input' placeholder='Titles and tags..'>
-                        <input type='submit' value='search'>
+                        <input type='search' name='search-input' id='search-input' placeholder='Titles and tags..'>
+                        <label for='submit-search'><i class=\"fa fa-search\" aria-hidden=\"true\"></i></label>
+                        <input type='submit' value='search' id='submit-search'>
+                    </form>
+                </li>" :
+
+               "<li class='rightmenuitem'><a href='./login.php' class='menulink'>Login</a></li>" .
+               "<li class='rightmenuitem'><a href='./register.php' class='menulink'>Register</a></li>
+                <li class='rightmenuitem'>
+                    <form id='search-form' name='search-form' action='./index.php' method='post'>
+                        <input type='search' name='search-input' id='search-input' placeholder='Titles and tags..'>
+                        <label for='submit-search'><i class=\"fa fa-search\" aria-hidden=\"true\"></i></label>
+                        <input type='submit' value='search' id='submit-search'>
                     </form>
                 </li>") .
            "</ul>
         </nav>";
+}
+
+function echo_footer(){
+    echo
+    "<footer>
+        <p>Continue the journey on social media!</p>
+        <section id='social-media'>
+            <a href=''><img src='./images/facebook.svg' class='social-image'></a>
+            <a href=''><img src='./images/twitter.svg' class='social-image'></a>
+            <a href=''><img src='./images/instagram.svg' class='social-image'></a>
+            <a href=''><img src='./images/google.svg' class='social-image'></a>
+            <a href=''><img src='./images/youtube.svg' class='social-image'></a>
+        </section>
+     </footer>";
 }
 
 
@@ -55,10 +80,12 @@ function get_navigation(){
  * This function checks if a users is logged
  * in and returns them to the login page if
  * they are not.
+ * @param $returnUrl
  */
-function check_user_logged_in(){
+function check_user_logged_in($returnUrl = ""){
     if(!isset($_SESSION['logged_in'])){
-        header('Location: ./login.php?access=denied');
+        $url = (!empty($returnUrl)? "&returnUrl=$returnUrl":"");
+        header("Location: ./login.php?access=denied$url");
     }
 }
 

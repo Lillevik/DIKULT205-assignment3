@@ -162,17 +162,23 @@ function insert_new_user($email, $username, $password){
     $pwHash = password_hash($password, PASSWORD_BCRYPT);
 
     /* Prevent sqlinjection */
-    $stmt = $conn->prepare('INSERT INTO users (email, username, password_hash) VALUES (?, ?, ?);');
-    $stmt->bind_param('sss', $email, $username, $pwHash);
+    if($stmt = $conn->prepare('INSERT INTO users (email, username, password_hash) VALUES (?, ?, ?);')){
+        $stmt->bind_param('sss', $email, $username, $pwHash);
 
-    /* Execute prepared statement */
-    $stmt->execute();
+        /* Execute prepared statement */
+        if($stmt->execute()){
+            $conn->commit();
 
-    $conn->commit();
-
-    /* Close db connection and statement*/
-    $stmt->close();
-    $conn->close();
+            /* Close db connection and statement*/
+            $stmt->close();
+            $conn->close();
+            return true;
+        }else{
+            return false;
+        }
+    }else{
+        return false;
+    }
 }
 
 /**

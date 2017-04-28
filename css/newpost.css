@@ -1,29 +1,21 @@
-html{
-    min-height:100vh;
-    background-color: #f5f6fa;
+body{
+    overflow: auto;
 }
 
 main{
     overflow: auto;
 }
 
-text, p, label, span, input, a, i, input{
-    font-size: 12px;
-    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-}
-
-
-
 /* Styles the register form */
-form{
+#post-form{
     width: 600px;
     margin: 10vh auto 50px;
     max-width: 100%;
     border: 1px solid silver;
     border-radius:2px;
-    -webkit-box-shadow: 0px 0px 30px -4px rgba(153,133,153,1);
-    -moz-box-shadow: 0px 0px 30px -4px rgba(153,133,153,1);
-    box-shadow: 0px 0px 30px -4px rgba(153,133,153,1);
+    -webkit-box-shadow: 0 0 30px -4px rgba(153,133,153,1);
+    -moz-box-shadow: 0 0 30px -4px rgba(153,133,153,1);
+    box-shadow: 0 0 30px -4px rgba(153,133,153,1);
     background-color:#f8f9fd;
     overflow: auto;
     padding: 30px;
@@ -88,7 +80,7 @@ label[for="file-upload"] {
     height: 20px;
 }
 
-input[type="submit"]{
+.sub-form-button{
     display:block;
     float: right;
     padding:6px 12px;
@@ -130,11 +122,16 @@ input[type="submit"]{
 }
 
 .tag-label{
-    border:1px solid #333;
     border-radius: 2px;
     padding:5px;
     margin:5px;
     float: left;
+    transition: all 0.2s;
+    background:rgba(213,243,255,0.96);
+}
+
+.tag-label:hover{
+    cursor: pointer;
 }
 
 input[type=checkbox]{
@@ -142,7 +139,11 @@ input[type=checkbox]{
 } 
 
 input[type=checkbox]:checked + label {
-  background:green;
+    background-color:rgba(42,158,172,0.96);
+    color:white;
+    -webkit-box-shadow: 0 0 30px -4px rgba(153,133,153,1);
+    -moz-box-shadow: 0 0 30px -4px rgba(153,133,153,1);
+    box-shadow: 0 0 30px -4px rgba(153,133,153,1);
 }
 
 #buttons{
@@ -153,8 +154,8 @@ input[type=checkbox]:checked + label {
 
 
 @media(max-width: 500px){
-    form{
-        padding:5px;
+    #post-form{
+        padding:2px;
     }
 }
 
