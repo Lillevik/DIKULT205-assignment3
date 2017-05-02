@@ -29,19 +29,13 @@ $url = $post['post_key'] . $post['extension'];
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <link href="https://use.fontawesome.com/db87107c26.css" media="all" rel="stylesheet">
+    <?php echo_metadata($post['title']) ?>
     <link rel="stylesheet" href="./css/singlePost.css">
-    <link rel="stylesheet" href="./css/menu.css">
-
-
     <script src="./js/jquery.js"></script>
     <script src="js/config.js"></script>
     <script src="./js/post.js"></script>
     <script src="./js/likes.js"></script>
     <script src="./js/favourite.js"></script>
-    <title><?php echo $post['title'] ?></title>
-
 </head>
 <body>
     <header>
@@ -60,7 +54,7 @@ $url = $post['post_key'] . $post['extension'];
                 <img id="post-image" src="./uploadsfolder/<?php echo $url?>">
             </div>
             <section id="description">
-                <?php echo $post['description'] ?>
+                <?php echo nl2br($post['description']) ?>
             </section>
             <section id="tag-section">
                 <?php echo_post_tags($post['id']) ?>

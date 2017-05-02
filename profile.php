@@ -23,7 +23,6 @@ check_user_logged_in();
         <?php get_navigation(); ?>
     </header>
     <main>
-        <p>Change your avatar <a href="./avatar.php">here</a>.</p>
         <section id="personal-posts">
             <?php
                 $posts = get_personal_posts();

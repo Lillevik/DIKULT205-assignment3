@@ -21,6 +21,7 @@ function get_navigation(){
     //Gets the session variables, username and avatar
     $username = (isset($_SESSION['username']) ? $_SESSION['username'] : null);
     $avatar = (!empty($_SESSION['avatar']) ? './avatars/' . $_SESSION['avatar'] : './images/profile.png');
+    $rank = (isset($_SESSION['rank']) ? $_SESSION['rank'] : "");
     echo
         "<nav>
             <ul class='menulist'>
@@ -37,11 +38,20 @@ function get_navigation(){
                         <span id='username'>$username</span>
                     </div>
                     <ul class='droplist'>
+                  
+                        ".
+                        //Check if the user is an administator and add link to control panel
+                        ($rank == 'admin' ?
+                        "<li class='droplist-item'><a href='./cpanel.php' class='menulink-dropdown'>CPanel</a></li>"
+                        :"")
+                        //################
+                        ."
+                        <li class='droplist-item'><a href='./avatar.php' class='menulink-dropdown'>Avatar</a></li>
                         <li class='droplist-item'><a href='./profile.php' class='menulink-dropdown'>Profile</a></li>
                         <li class='droplist-item'><a href='./login.php?logout=true' class='menulink-dropdown'>Logout</a></li>
                     </ul>
                 </li>
-                <li class='rightmenuitem'>
+                <li class='rightmenuitem' id='search-list-item'>
                     <form id='search-form' name='search-form' action='./index.php' method='post'>
                         <input type='search' name='search-input' id='search-input' placeholder='Titles and tags..'>
                         <label for='submit-search'><i class=\"fa fa-search\" aria-hidden=\"true\"></i></label>
@@ -53,7 +63,7 @@ function get_navigation(){
 
                "<li class='rightmenuitem'><a href='./login.php' class='menulink'>Login</a></li>" .
                "<li class='rightmenuitem'><a href='./register.php' class='menulink'>Register</a></li>
-                <li class='rightmenuitem'>
+                <li class='rightmenuitem' id='search-list-item'>
                     <form id='search-form' name='search-form' action='./index.php' method='post'>
                         <input type='search' name='search-input' id='search-input' placeholder='Titles and tags..'>
                         <label for='submit-search'><i class=\"fa fa-search\" aria-hidden=\"true\"></i></label>
@@ -92,6 +102,12 @@ function check_user_logged_in($returnUrl = ""){
     }
 }
 
+/**
+ * Checks if a user is logged in and returns
+ * a boolean if true or false.
+ *
+ * @return bool
+ */
 function user_is_logged_in(){
     if(isset($_SESSION['logged_in'])){
         return true;
@@ -169,6 +185,13 @@ function indent($json) {
     return $result;
 }
 
+/**
+ * This function takes a list of comment objects as
+ * a parameter and recursively echo's them as a
+ * nested comment tree structure.
+ *
+ * @param $comments
+ */
 function echo_comment_tree($comments){
     foreach($comments as $com){
         $avatar = ($com->avatar != null ? './avatars/' . $com->avatar: './images/profile.png');

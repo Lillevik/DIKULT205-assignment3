@@ -12,7 +12,6 @@ include __dir__ . "/" .get_connect_path();
 
 
 /**
- *
  * Creates and returns a mysqli connection
  * using the credentials found in the config file
  * @return mysqli connection
@@ -219,7 +218,11 @@ function user_exists($username_to_check, $email_to_check){
 }
 
 /**
- * This function
+ * This function checks the given users inputs against
+ * the database and logs the user in if an account exists
+ * and the passwords matches the hash stored in the database.
+ * If the user is validated, some session variables are stored
+ * to later recognize the user throughout the website.
  *
  *
  * @param $username_or_email
@@ -229,12 +232,12 @@ function user_exists($username_to_check, $email_to_check){
 function validate_login($username_or_email, $password){
     $conn = get_conn();
 
-    $smnt = $conn->prepare('SELECT id, email, username, password_hash, avatar FROM users WHERE username = ? or email = ?');
+    $smnt = $conn->prepare('SELECT id, email, username, password_hash, avatar, rank FROM users WHERE username = ? or email = ?');
     $smnt->bind_param('ss', $username_or_email, $username_or_email);
     $smnt->execute();
 
     $smnt->store_result();
-    $smnt->bind_result($id, $email, $username, $hash, $avatar);
+    $smnt->bind_result($id, $email, $username, $hash, $avatar, $rank);
 
     if($smnt->fetch()) {
         if(password_verify($password, $hash)){
@@ -244,6 +247,7 @@ function validate_login($username_or_email, $password){
             $_SESSION['email'] = $email;
             $_SESSION['id'] = $id;
             $_SESSION['avatar'] = $avatar;
+            $_SESSION['rank'] = $rank;
             return true;
         }else{
             return false;
@@ -380,18 +384,18 @@ function echo_posts($posts){
         echo '<section class="post-wrapper">
                     <h1 class="post-title">'. $post->title .'</h1>
                     <a href="./post.php?key='.$post->post_key.'">
-                    <img class="post-image" src="./uploadsfolder/' . $cropped_image . '" onclick="start_gif(this)">' .
-            '</a>' .
-            '<section class="details">
-                            <p class="post-description">' .$post->description . '</p><hr>' .
-            '<time class="date">Added:'. date("d/m/Y", strtotime($post->added)).'</time>' .
-            '<p class="likes">
-                                <i class="fa fa-star' . (isset($post->favourite_id) ? "":"-o") . '" id="'.$post->id.'" onclick="favourite_post(this)"></i>
-                                <i class="fa fa-heart'.(isset($post->liked_id) ? "" : "-o") .'" id="'.$post->id.'"  onclick="like_post(this)"></i>
-                                <span id="likes_count_'.$post->id.'">'.$post->likes.'</span> likes
-                            </p>' .
-            '<p class="post-username">Posted by: '.$post->username . '</p>' . ($logged_in_user_id == $post->user_id ? '<a href="./edit_post.php?post='.$post->id.'"><img src="./images/edit.png" class="edit-icon"></a>' : '') .
-            '</section>'  .
+                    <img class="post-image" src="./uploadsfolder/' . $cropped_image . '">' .
+                    '</a>' .
+                    '<section class="details">
+                                    <p class="post-description">' .nl2br($post->description) . '</p><hr>' .
+                    '<time class="date">Added:'. date("d/m/Y", strtotime($post->added)).'</time>' .
+                    '<p class="likes">
+                                        <i class="fa fa-star' . (isset($post->favourite_id) ? "":"-o") . '" id="'.$post->id.'" onclick="favourite_post(this)"></i>
+                                        <i class="fa fa-heart'.(isset($post->liked_id) ? "" : "-o") .'" id="'.$post->id.'"  onclick="like_post(this)"></i>
+                                        <span id="likes_count_'.$post->id.'">'.$post->likes.'</span> likes
+                                    </p>' .
+                    '<p class="post-username">Posted by: '.$post->username . '</p>' . ($logged_in_user_id == $post->user_id ? '<a href="./edit_post.php?post='.$post->id.'"><img src="./images/edit.png" class="edit-icon"></a>' : '') .
+                    '</section>'  .
             '</section>';
     }
 }
@@ -1307,11 +1311,9 @@ function get_posts_by_tag_name($tag_name, $con = null){
         $stmt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $user_id, $liked_id, $favourite_id);
         while($stmt->fetch()){
             $posts[$id] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $username, $liked_id, $favourite_id);
-
         }
     }
     return $posts;
-
 }
 
 

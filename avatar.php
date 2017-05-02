@@ -122,6 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
                     <label for="inputFile">Jpg, png or gif files</label>
                     <input id="inputFile" type="file" name="inputFile">
                     <label for="userImage">Or choose from your other avatars</label>
+                    <div>
                     <?php
                         $avatars = get_user_avatars($_SESSION['id']);
                         foreach ($avatars as $ava){
@@ -133,9 +134,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
                              </label>";
                         }
                     ?>
-                    <br><br><br><br><br><br>
-                    <label for="removeAvatar">Or remove avatar</label>
-                    <input type="radio" name="removeAvatar" id="removeAvatar">
+
+
+                    <label for="removeAvatar">Or remove avatar
+                        <input type="radio" name="removeAvatar" id="removeAvatar">
+                    </label>
+                    <p id="info-message">This functionality is not all done yet, but it's working. For now,
+                    if you select a file, the file will be uploaded and selected. If you dont select a file, but
+                    a previous avatar, the previous avatar is selected, and if you dont select a new or a previous avatar,
+                    but you choose to remove your current, the avatar will be removed. The images might also be cropped properly
+                    in the future. A square image is therefore also preferred.</p>
                     <input type="submit" value="Save" id="saveButton">
                 </form>
 

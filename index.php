@@ -48,7 +48,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 echo "<section id=\"search-results\">";
                 $numberOfResults = count($posts);
                 echo "<h2>You searched for: $query</h2>";
-                echo "Total results: $numberOfResults";
+                echo "<p>Total results: $numberOfResults</p>";
                 echo "</section>";
             }
             ?>

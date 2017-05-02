@@ -22,8 +22,6 @@ input{
     border: 1px solid silver;
     border-radius:2px;
     padding-bottom:15px;
-    -webkit-box-shadow: 0px 0px 30px -4px rgba(153,133,153,1);
-    -moz-box-shadow: 0px 0px 30px -4px rgba(153,133,153,1);
     box-shadow: 0px 0px 30px -4px rgba(153,133,153,1);
     background-color:#f8f9fd;
     overflow: auto;
@@ -37,8 +35,6 @@ input{
     max-width: 100%;
     border: 1px solid grey;
     border-radius:2px;
-    -webkit-box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.75);
-    -moz-box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.75);
     box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.75);
 }
 

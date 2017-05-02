@@ -4,6 +4,7 @@ body{
 
 main{
     overflow: auto;
+    width: 100vw;
 }
 
 /* Styles the register form */
@@ -13,8 +14,6 @@ main{
     max-width: 100%;
     border: 1px solid silver;
     border-radius:2px;
-    -webkit-box-shadow: 0 0 30px -4px rgba(153,133,153,1);
-    -moz-box-shadow: 0 0 30px -4px rgba(153,133,153,1);
     box-shadow: 0 0 30px -4px rgba(153,133,153,1);
     background-color:#f8f9fd;
     overflow: auto;
@@ -33,11 +32,14 @@ main{
 
 
 #description{
-    width: 100%;
-    height: 200px;
+    min-height: 100px;
     display: block;
-    margin: 0px auto 10px;
+    margin: auto;
     padding:10px;
+    width: 100%;
+    box-sizing: border-box;
+    border:1px solid silver;
+    outline: none;
 }
 
 
@@ -55,9 +57,15 @@ label[for="file-upload"] {
 }
 
 #file-label-contents{
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
     width: 130px;
     max-width: 100%;
 }
@@ -72,8 +80,8 @@ label[for="file-upload"] {
 #preview{
     max-width:100%;
     overflow: auto;
-    margin: 20px auto 0;
     display: none;
+    margin: 20px auto 10px;
 }
 
 #upload-icon{
@@ -112,7 +120,8 @@ label[for="file-upload"] {
     display: block;
     width: 90%;
     color:#fa5c6a;
-    margin: 20px auto 0;
+    padding-top:5px;
+    margin: 0;
 }
 
 
@@ -126,6 +135,7 @@ label[for="file-upload"] {
     padding:5px;
     margin:5px;
     float: left;
+    -webkit-transition: all 0.2s;
     transition: all 0.2s;
     background:rgba(213,243,255,0.96);
 }
@@ -141,8 +151,6 @@ input[type=checkbox]{
 input[type=checkbox]:checked + label {
     background-color:rgba(42,158,172,0.96);
     color:white;
-    -webkit-box-shadow: 0 0 30px -4px rgba(153,133,153,1);
-    -moz-box-shadow: 0 0 30px -4px rgba(153,133,153,1);
     box-shadow: 0 0 30px -4px rgba(153,133,153,1);
 }
 
@@ -155,7 +163,10 @@ input[type=checkbox]:checked + label {
 
 @media(max-width: 500px){
     #post-form{
-        padding:2px;
+        padding:10px;
+        margin-top:10px;
+        box-sizing: border-box;
+
     }
 }
 
