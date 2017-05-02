@@ -38,7 +38,6 @@ window.onload = function(){
         footer.css("position", "absolute");
         footer.css("bottom", "0");
         rightCon.css({'position':'absolute','right':'0', 'z-index':999, 'top':'-43px'})
-
     }
 };
 

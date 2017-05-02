@@ -103,10 +103,6 @@ main{
     display: inline-block;
 }
 
-.post-username{
-    float: right;
-}
-
 #likes-window{
     background-color:#333;
     display: none;
@@ -172,6 +168,25 @@ main{
 .category-link{
     list-style: none;
     text-decoration: none;
+}
+
+.profile-wrapper{
+    height: 20px;
+    display: flex;
+    align-items: center;
+    float: right;
+    overflow: hidden;
+    justify-content: space-between;
+}
+
+.profile-wrapper *{
+    padding: 2px;
+}
+
+
+.profile-image{
+    height: inherit;
+    border-radius: 100%;
 }
 
 

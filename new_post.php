@@ -18,8 +18,8 @@ include 'image_resizing.php';
 if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 
     $err_arr = Array();
-    $title = (isset($_POST['title']) ? $_POST['title'] : '');
-    $description = (isset($_POST['description']) ? $_POST['description'] : '');
+    $title = (isset($_POST['title']) ? strip_tags($_POST['title']) : '');
+    $description = (isset($_POST['description']) ? strip_tags($_POST['description']) : '');
     $tags = (isset($_POST['tags']) ? $_POST['tags'] : Array());
     $numberOfTags = count($tags);
     if($numberOfTags > 5){
