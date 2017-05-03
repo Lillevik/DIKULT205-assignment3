@@ -14,7 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     $domain = get_domain();
     $user_id =$_SESSION['id'];
     $err_arr = Array();
-    echo ($_FILES['inputFile']['size'] != 0);
+    $infoMsg = null;
+
     if($_FILES['inputFile']['size'] != 0){
         $target_dir = "./avatars/";
         $target_file = $target_dir . basename($_FILES["inputFile"]['name']);
@@ -25,7 +26,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 
         // Check if image file is an actual image or fake image
-        if(@is_array(getimagesize($_FILES["inputFile"]["tmp_name"]))){
+        $fileContent = exif_imagetype(($_FILES["inputFile"]["tmp_name"]));
+
+        if($fileContent == IMAGETYPE_GIF or $fileContent == IMAGETYPE_JPEG or $fileContent == IMAGETYPE_PNG){
             $image = true;
             $uploadOk = 1;
         } else {
@@ -58,17 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
         }
 
-        //Resize file
-        $resize_ok = null;
-        try{
-            $resize_ok = resize_image_width($_FILES["inputFile"]["tmp_name"], $target_dir, $filestring . "80." . $imageFileType, 80, 80);
-            if(!$resize_ok[0]){
-                array_push($err_arr, $resize_ok[1]);
-                $uploadOk = 0;
-            };
-        }catch (Exception $e){
-            array_push($err_arr, "<p class='error-message'>Sorry, there was an error handling the file.</p>");
-        }
+
 
         // Check if $uploadOk is set to 0 by an error
         if ($uploadOk == 0) {
@@ -81,10 +74,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 
             if (move_uploaded_file($_FILES["inputFile"]["tmp_name"], $target_dir . $filename)) {
                 $avatarImage = $filestring . "80." . $imageFileType;
-                insert_new_avatar($filestring, "." . $imageFileType, $user_id);
-                update_user_avatar($user_id, $avatarImage);
-                $_SESSION['avatar'] = $avatarImage;
-                $infoMsg = 'Your uploaded avatar was added and selected';
+                $resize_ok = resize_crop_image(80, 80,$target_dir . $filename, $target_dir . $avatarImage, 100);
+                if(!$resize_ok[0]){
+                    $err_arr[] = $resize_ok[1];
+                    unlink($target_dir . $filename);
+                }else{
+                    insert_new_avatar($filestring, "." . $imageFileType, $user_id);
+                    update_user_avatar($user_id, $avatarImage);
+                    $_SESSION['avatar'] = $avatarImage;
+                    unlink($target_dir . $filename);
+                    header('Location: ./avatar.php?upload=success');
+                    exit();
+                }
             } else {
                 array_push($err_arr, "<p class='error-message'>Sorry, there was an error uploading your file.</p>");
             }
@@ -92,13 +93,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     }else if(isset($_POST['radioImage'])){
         update_user_avatar($user_id, $_POST['radioImage']);
         $_SESSION['avatar'] = $_POST['radioImage'];
-        $infoMsg = 'Your selected avatar was updated.';
+        header('Location: ./avatar.php?selected=true');
+        exit();
     }else if(isset($_POST['removeAvatar'])){
         update_user_avatar($user_id, null);
         $_SESSION['avatar'] = null;
-        $infoMsg = "Your avatar was removed.";
+        header('Location: ./avatar.php?rmd=true');
+        exit();
     }
 }
+if(isset($_GET['upload'])){
+    $infoMsg = 'Your uploaded avatar was added and selected';
+}else if(isset($_GET['selected'])){
+    $infoMsg = 'Your selected avatar was updated.';
+}else if(isset($_GET['rmd'])){
+    $infoMsg = "Your avatar was removed.";
+}
+
 
 ?>
 <!DOCTYPE html>
@@ -116,6 +127,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
             <h1>Profile</h1>
             <section>
                 <h3>Select avatar</h3>
+                <?php
+                if(isset($err_arr)) {
+                    foreach ($err_arr as $msg) {
+                        echo "<p class='err-msg'>$msg</p>";
+                    }
+                }
+                ?>
                 <h4><?php echo (isset($infoMsg)? $infoMsg : null)?></h4>
                 <img src="<?php echo ($_SESSION['avatar'] != null ? './avatars/' . $_SESSION['avatar'] : './images/profile.png')?>" id="avatar-preview">
                 <form action="avatar.php" method="post" id="choose-avatar-form" enctype="multipart/form-data">
@@ -139,11 +157,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
                     <label for="removeAvatar">Or remove avatar
                         <input type="radio" name="removeAvatar" id="removeAvatar">
                     </label>
-                    <p id="info-message">This functionality is not all done yet, but it's working. For now,
-                    if you select a file, the file will be uploaded and selected. If you dont select a file, but
-                    a previous avatar, the previous avatar is selected, and if you dont select a new or a previous avatar,
-                    but you choose to remove your current, the avatar will be removed. The images might also be cropped properly
-                    in the future. A square image is therefore also preferred.</p>
+                    <p id="info-message">This functionality is not all done yet, but it's working for now.</p>
+                    <ol type="1" id="info-list">
+                        <li>If you select a file, the file will be uploaded and selected.</li>
+                        <li>If you dont select a file, but a previous avatar, the previous avatar is selected</li>
+                        <li>If you dont select a new or a previous avatar,
+                            but you choose to remove your current, the avatar will be removed
+                        </li>
+                    </ol>
                     <input type="submit" value="Save" id="saveButton">
                 </form>
 

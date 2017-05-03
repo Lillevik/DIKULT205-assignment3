@@ -33,8 +33,15 @@ function show_input(id){
     }
     var parent = document.getElementById(id);
 
+    var otherLiElemens = parent.querySelectorAll('.text-area-list-element');
+    for(var i = 0; i < otherLiElemens.length; i++){
+        otherLiElemens[i].remove();
+    }
+
     var listElem = document.createElement('li');
+    listElem.classList.add('text-area-list-element');
     var field = document.createElement('textarea');
+    field.setAttribute('placeholder', 'Enter a comment here and press enter..');
 
     listElem.appendChild(field);
     parent.appendChild(listElem);
@@ -45,12 +52,14 @@ function show_input(id){
     //Add event listener for the enter key
     currentShown.addEventListener('keyup',function(){
         var key = window.event.keyCode;
-        if(key === 13){
+        if(key === 10 || key === 13){
             console.log(this.parentNode.parentNode)
             add_comment(this.value, this.parentNode.parentNode, this, params.key);
             this.value = '';
         }
     });
+
+    field.focus();
 }
 
 
@@ -170,12 +179,14 @@ function add_comment(text, parent_element, field, p_key){
                         details.appendChild(listContainer);
 
                         $(details).insertAfter(selfParent);
+                        details.open = true;
                     }else{
                         console.log(sibling.childNodes[0].childNodes[0]);
                         var count = sibling.childNodes[0].childNodes[0];
                         count.innerHTML = parseInt(count.innerHTML) + 1;
 
                         newParentElement.prepend(commentElement);
+                        newParentElement.open = true;
                     }
                 }
 

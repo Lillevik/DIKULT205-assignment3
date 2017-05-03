@@ -88,3 +88,14 @@ label[for="removeAvatar"]{
     float: left;
     width: 100%;
 }
+
+#info-list{
+    float: left;
+    width: 100%;
+    margin-left:0;
+    padding-left:20px;
+}
+
+.error-msg{
+    color:indianred;
+}

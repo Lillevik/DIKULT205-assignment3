@@ -251,6 +251,23 @@ summary{
     border-radius:2px;
 }
 
+.text-area-list-element{
+    margin-left:40px;
+    padding-top:5px;
+    padding-bottom:5px;
+}
+
+.text-area-list-element > textarea{
+    display: block;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    resize: none;
+    border:1px solid silver;
+    border-radius:5px;
+
+}
+
 @media(max-width: 500px){
     #comment-form{
         display: block;

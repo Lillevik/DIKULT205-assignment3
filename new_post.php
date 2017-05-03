@@ -55,8 +55,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
         $uploadOk = 1;
 
 
-        // Check if image file is an actual image or fake image
-        if (@is_array(getimagesize($_FILES["file-upload"]["tmp_name"]))) {
+        $fileContent = exif_imagetype(($_FILES["file-upload"]["tmp_name"]));
+
+        if($fileContent == IMAGETYPE_GIF or $fileContent == IMAGETYPE_JPEG or $fileContent == IMAGETYPE_PNG){
             $image = true;
             $uploadOk = 1;
         } else {
@@ -90,20 +91,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
         }
 
-        //Resize file
-        $resize_ok = null;
-        try {
-            $resize_ok = resize_image_to_400($_FILES["file-upload"]["tmp_name"], $target_dir, $cropped_name);
-            resize_image_width($_FILES["file-upload"]["tmp_name"], $target_dir, $filestring . "800." . $imageFileType, 800, 100);
-        } catch (Exception $e) {
-            array_push($err_arr, "Sorry, there was an error handling the file.");
-        }
+        if($uploadOk != 0) {
+            //Resize file
+            $resize_ok = null;
+            try {
 
-        if ($resize_ok[0]) {
-            $uploadOk = 1;
-        } else {
-            array_push($err_arr, $resize_ok[1]);
-            $uploadOk = 0;
+                $resize_ok = resize_image_to_400($_FILES["file-upload"]["tmp_name"], $target_dir, $cropped_name);
+                resize_image_width($_FILES["file-upload"]["tmp_name"], $target_dir, $filestring . "800." . $imageFileType, 800, 100);
+            } catch (Exception $e) {
+                array_push($err_arr, "Sorry, there was an error handling the file.");
+            }
+
+            if ($resize_ok[0]) {
+                $uploadOk = 1;
+            } else {
+                array_push($err_arr, $resize_ok[1]);
+                $uploadOk = 0;
+            }
         }
 
         // Check if $uploadOk is set to 0 by an error
