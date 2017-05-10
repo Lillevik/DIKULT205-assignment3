@@ -64,22 +64,23 @@ main{
     box-shadow: 0 0 30px -4px rgba(153,133,153,1);
     background-color:#f8f9fd;
     margin: 0 auto 20px;
-    max-width: 95%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .details{
     width: 450px;
     display: block;
     margin: 0 auto;
-    max-width: 90%;
+    max-width: 100%;
 }
 
 .post-title{
     font-size: 20px;
     width: 450px;
     display: block;
-    margin:0 auto;
-    max-width: 90%;
+    max-width: 100%;
+    margin: 0 auto 5px;
 }
 
 .like-button{
@@ -209,6 +210,14 @@ main{
 
     .post-wrapper{
         width: 100%;
+    }
+
+    .post-title{
+        margin:0 auto;
+    }
+
+    .details{
+        margin: 0 auto;
     }
 
 }

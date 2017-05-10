@@ -1,0 +1,82 @@
+main{
+    width: 900px;
+    max-width: 100%;
+    margin: 20px auto;
+    padding:20px;
+    box-sizing: border-box;
+    display: block;
+    overflow: auto;
+    position: relative;
+}
+
+/* styles the profile information */
+#profile-info{
+    width: 300px;
+    background:white;
+    box-shadow: 0 0 30px -4px rgba(153,133,153,1);
+    position: fixed;
+    margin-left:0px;
+    margin-top: 0px;
+    max-width: 100%;
+}
+
+#profile-info-header{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding:10px;
+}
+
+#profile-name{
+    width: 100%;
+    text-align: center;
+}
+
+#profile-details{
+    padding:10px;
+    overflow: auto;
+}
+
+.profile-detail{
+    width: 50%;
+    float: left;
+    margin-top:2px;
+    margin-bottom:2px;
+}
+
+#personal-posts{
+    float: right;
+    width: 60%;
+}
+
+.post-wrapper{
+    margin-right:0;
+}
+
+@media(max-width: 840px){
+    #profile-info{
+        width: 500px;
+        position: static;
+        margin:0 auto;
+    }
+
+    #personal-posts{
+        width: auto;
+        float: none;
+        margin: 10px auto 0;
+    }
+
+    .post-wrapper{
+        margin: 0 auto 10px;
+    }
+}
+
+@media(max-width: 750px){
+    #profile-info{
+        width: 100%;
+    }
+
+    main{
+        padding:5px;
+    }
+}

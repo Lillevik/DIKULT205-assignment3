@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         $description = strip_tags($post_array['description']);
         $filename = $post_array['post_key'] . $post_array['extension'];
         $user_id = $post_array['user_id'];
-        $editSuccess = true;
+        $editSuccess = (isset($_GET['success']) ? true:false);
         if($_SESSION['id'] != $user_id){
             echo "This is not your post, shame on you...";
             exit();
@@ -75,10 +75,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
                 echo '<p>Permalink: <a href="./post.php?key='.$post_array['post_key'].'">here</a></p>';
             }
             ?>
-            <?php echo (isset($_GET['success']) ? "<p class='success-message'>Successfully updated the post.</p>" : null);?>
+
+            <label for="title" class="inputlabel">Title</label>
             <input type="text" id="title" name="title" placeholder="Enter a title for your post..." value="<?php echo (isset($title)? $title: "") ?>" maxlength="100">
             <div id="title-chars"><span id="number-of-title-chars"><?php echo (isset($title)? strlen($title): "") ?></span> of 100 characters</div>
             <img id="preview" src="./uploadsfolder/<?php echo $filename ?>" alt="Your image is displayed here" title="Your image">
+            <label for="description" class="inputlabel">Description</label>
             <textarea id="description" name="description" placeholder="Enter a short describing text for your post..." maxlength="300"><?php echo (isset($description)? $description : "") ?></textarea>
             <div id="description-chars"><span id="number-of-description-chars"><?php echo (isset($description)? strlen($description) : "") ?></span> of 300 characters.</div>
             <p>Select between 1 to 5 tags for your post. An accurate title and use of relevant

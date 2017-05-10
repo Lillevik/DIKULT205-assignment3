@@ -70,7 +70,7 @@ $url = $post['post_key'] . $post['extension'];
 
             <form id="comment-form" action="./post.php?key=<?php echo $post['post_key'] ?>" method="post">
                 <textarea id="comment-field" name="comment-field" placeholder="Comment here.."></textarea>
-                <input type="submit" id="sub-button" name="sub-button">
+                <input type="submit" id="sub-button" name="sub-button" value="Submit">
             </form>
 
             <ul id="comments-list">

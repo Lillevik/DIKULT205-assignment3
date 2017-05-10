@@ -315,10 +315,10 @@ function insert_new_post($title, $description, $filename, $userid, $tags){
  * @param string $tagSearch
  * @return array
  */
-function get_posts($offset, $searchQuery = '', $tagSearch = ''){
-    $conn = get_conn();
+function get_posts($offset = 1, $searchQuery = '', $tagSearch = '', $username = null, $con = null){
+    $conn = (isset($con) ? $con:get_conn());
     $offset = ($offset - 1) * 10;
-    $logged_in_user_id = (isset($_SESSION['id']) ? $_SESSION['id'] : '');
+    $logged_in_user_id = (isset($_SESSION['id']) ? $_SESSION['id'] : null);
     $posts = Array();
 
     /* Search for posts if query is give or fetches after offset if not */
@@ -327,32 +327,60 @@ function get_posts($offset, $searchQuery = '', $tagSearch = ''){
     }else if(!empty($tagSearch)){
         $posts = get_posts_by_tag_name($tagSearch, $conn);
     }else{
-        /* Prepare statement to prevent sqlinjection */
-        $smnt = $conn->prepare('SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, users.avatar, posts.user_id, likes.user_id, favourites.user_id
+
+        if(isset($username)){
+            /* Prepare statement to prevent sqlinjection */
+            if($smnt = $conn->prepare('SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, users.avatar, posts.user_id, likes.user_id, favourites.user_id
+                                       FROM users
+                                       JOIN posts ON (posts.user_id = users.id) 
+                                       LEFT JOIN likes ON (likes.user_id = ? AND posts.id = likes.post_id)
+                                       LEFT JOIN favourites ON (favourites.user_id = ? AND posts.id = favourites.post_id)
+                                       WHERE users.username = ?
+                                       ORDER BY posts.id ASC;')){
+                /* Bind parameters */
+                $smnt->bind_param('iis', $logged_in_user_id, $logged_in_user_id, $username);
+                $smnt->execute();
+
+                $smnt->store_result();
+                $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $avatar, $user_id, $liked_id, $favourite_id);
+
+
+                /* Adds post objects to a list */
+                while ($smnt->fetch()) {
+                    $posts[] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $username, $avatar, $liked_id, $favourite_id);
+                }
+            }else{
+                echo $conn->error;
+            }
+
+
+        }else {
+            /* Prepare statement to prevent sqlinjection */
+            $smnt = $conn->prepare('SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, users.avatar, posts.user_id, likes.user_id, favourites.user_id
                                        FROM posts
                                        JOIN users ON (posts.user_id = users.id ) 
                                        LEFT JOIN likes ON (likes.user_id = ? AND posts.id = likes.post_id)
                                        LEFT JOIN favourites ON (favourites.user_id = ? AND posts.id = favourites.post_id)
-                                       ORDER BY posts.id desc LIMIT 10 OFFSET ?;');
-        /* Bind parameters */
-        $smnt->bind_param('iii', $logged_in_user_id, $logged_in_user_id ,$offset);
-        $smnt->execute();
+                                       ORDER BY posts.id DESC LIMIT 10 OFFSET ?;');
+            /* Bind parameters */
+            $smnt->bind_param('iii', $logged_in_user_id, $logged_in_user_id, $offset);
+            $smnt->execute();
 
-        $smnt->store_result();
-        $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $avatar, $user_id, $liked_id, $favourite_id);
+            $smnt->store_result();
+            $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $avatar, $user_id, $liked_id, $favourite_id);
 
 
-        /* Adds post objects to a list */
-        while($smnt->fetch()){
-            $posts[] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $username, $avatar, $liked_id, $favourite_id);
+            /* Adds post objects to a list */
+            while ($smnt->fetch()) {
+                $posts[] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $username, $avatar, $liked_id, $favourite_id);
+            }
         }
     }
-
     $current_rows = count($posts);
 
 
 
-    if(empty($searchQuery)){
+    if(empty($searchQuery) && $username = null){
         $smnt1 = $conn->prepare('SELECT COUNT(id) FROM posts;');
         $smnt1->execute();
         $smnt1->bind_result($id);
@@ -400,7 +428,7 @@ function echo_posts($posts){
                     </p>' .
                     '<div class="profile-wrapper">
                         <img class="profile-image" src="'.$avatar.'">
-                        <p class="post-username">'.$post->username . '</p>'
+                        <a href="./profile.php?user='.$post->username.'"><p class="post-username">'.$post->username . '</p></a>'
                         . ($logged_in_user_id == $post->user_id ?
                         '<a href="./edit_post.php?post='.$post->id.'">
                             <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
@@ -415,28 +443,45 @@ function echo_posts($posts){
  * Gets all the posts for the logged in user.
  * Used in the profile page.
  *
- * @return array - An array of post objects
+ * @return array|bool
  */
-function get_personal_posts(){
+function get_profile_info($username){
     $conn = get_conn();
+    $id = (isset($_SESSION['id']) ? $_SESSION['id'] : null);
+    $ustmnt = $conn->prepare('SELECT avatar FROM users WHERE username = ?');
+    $ustmnt->bind_param('s', $username);
+    if($ustmnt->execute()){
+        $ustmnt->bind_result($ava);
+        if($ustmnt->fetch()){
+            if(!isset($ava)){
+                $avatar = "./images/profile.png";
+            }else{
+                $avatar = "./avatars/$ava";
+            }
 
-    $id = $_SESSION['id'];
+            $ustmnt->close();
+            /* Prepare statement to prevent sqlinjection */
+            $post_info = get_posts(1,"", "", $username, $conn);
+            $posts = $post_info['posts'];
+            $total_posts = count($posts);
+            $total_likes = 0;
 
-    /* Prepare statement to prevent sqlinjection */
-    $smnt = $conn->prepare('SELECT id, title, description, likes, added, extension, post_key, user_id FROM posts WHERE user_id = ?');
-    $smnt->bind_param('i', $id);
+            foreach($posts as $post){
+                $total_likes += $post->likes;
+            }
 
-    $smnt->execute();
-
-    $smnt->store_result();
-    $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $user_id);
-
-    $post_arr = Array();
-    while($smnt->fetch()){
-        $post_arr[] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id);
+            //Return array of post objects, total likes and total posts.
+            $post_arr['posts'] = $posts;
+            $post_arr['total_likes'] = $total_likes;
+            $post_arr['total_posts'] = $total_posts;
+            $post_arr['avatar'] = $avatar;
+            return $post_arr;
+        }else{
+            return false;
+        }
     }
-    //Return array of post objects
-    return $post_arr;
+
+
 }
 
 
@@ -479,28 +524,32 @@ function delete_favourite_or_like($post_id, $user_id, $favourite_or_like_table){
  * @param $post_id
  * @param $user_id
  * @param $favourite_or_like_table
+ * @return bool
  */
 function insert_favourite_or_like($post_id, $user_id, $favourite_or_like_table){
     // Get a database connection
     $conn = get_conn();
 
     /* Prepare statement and prevent sqlinjection */
-    if($stmt = $conn->prepare('INSERT INTO '.$favourite_or_like_table.' (post_id, user_id) VALUES (?, ?);')){
+    if($stmt = $conn->prepare('INSERT INTO '.$favourite_or_like_table.' (post_id, user_id) VALUES (?, ?);')) {
         $stmt->bind_param('ii', $post_id, $user_id);
 
+        if($stmt->execute()){
+            $stmt1 = $conn->prepare('UPDATE posts SET '.$favourite_or_like_table.' = '.$favourite_or_like_table.' + 1 WHERE id = ?;');
+            $stmt1->bind_param('i', $post_id);
+            $stmt1->execute();
+            /* Execute prepared statement */
+            $conn->commit();
 
-        $stmt1 = $conn->prepare('UPDATE posts SET '.$favourite_or_like_table.' = '.$favourite_or_like_table.' + 1 WHERE id = ?;');
-        $stmt1->bind_param('i', $post_id);
+            /* Close db connection and statements*/
+            $stmt->close();
+            $stmt1->close();
+            $conn->close();
+            return true;
+        }else{
+            return false;
+        }
 
-        /* Execute prepared statement */
-        $stmt->execute();
-        $stmt1->execute();
-        $conn->commit();
-
-        /* Close db connection and statements*/
-        $stmt->close();
-        $stmt1->close();
-        $conn->close();
     }
 }
 

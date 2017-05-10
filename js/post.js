@@ -50,8 +50,8 @@ function show_input(id){
     currentShown = field;
 
     //Add event listener for the enter key
-    currentShown.addEventListener('keyup',function(){
-        var key = window.event.keyCode;
+    currentShown.addEventListener('keyup',function(e){
+        var key = e.keyCode ? e.keyCode : e.which;
         if(key === 10 || key === 13){
             console.log(this.parentNode.parentNode)
             add_comment(this.value, this.parentNode.parentNode, this, params.key);
