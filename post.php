@@ -51,7 +51,7 @@ $url = $post['post_key'] . $post['extension'];
             </p>
             <h1 class="post-title"><?php echo $post['title']?></h1>
             <div id="img-wrapper">
-                <img id="post-image" src="./uploadsfolder/<?php echo $url?>">
+                <img id="post-image" class="<?php echo ($post['nsfw']?'':'')?>" src="./uploadsfolder/<?php echo $url?>">
             </div>
             <section id="description">
                 <?php echo nl2br($post['description']) ?>

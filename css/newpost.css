@@ -53,6 +53,7 @@ label[for="file-upload"] {
     padding: 6px 12px;
     cursor: pointer;
     margin-top:20px;
+    margin-bottom:20px;
     display: block;
 }
 
@@ -144,6 +145,10 @@ label[for="file-upload"] {
     cursor: pointer;
 }
 
+.info{
+    margin-top:20px;
+}
+
 input[type=checkbox]{
     display: none;
 } 
@@ -152,6 +157,10 @@ input[type=checkbox]:checked + label {
     background-color:rgba(42,158,172,0.96);
     color:white;
     box-shadow: 0 0 30px -4px rgba(153,133,153,1);
+}
+
+#nsfw{
+    display: inline-block;
 }
 
 #buttons{

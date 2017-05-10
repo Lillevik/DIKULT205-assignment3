@@ -40,7 +40,7 @@ function get_navigation(){
                     <ul class='droplist'>
                   
                         ".
-                        //Check if the user is an administator and add link to control panel
+                        //Check if the user is an administrator and add a link to control panel
                         ($rank == 'admin' ?
                         "<li class='droplist-item'><a href='./cpanel.php' class='menulink-dropdown'>CPanel</a></li>"
                         :"")
@@ -71,7 +71,7 @@ function get_navigation(){
                     </form>
                 </li>") .
            "</ul>
-        </nav>";
+        \t</nav>\n";
 }
 
 function echo_footer(){
@@ -131,7 +131,6 @@ function random_string($len){
  * Indents a flat JSON string to make it more human-readable.
  *
  * @param string $json The original JSON string to process.
- *
  * @return string Indented version of the original JSON string.
  */
 function indent($json) {
@@ -205,6 +204,20 @@ function echo_comment_tree($comments){
             echo "</details>";
         }
     }
+}
+
+
+function add_line_indents($input, $indent){
+    $output = "";
+    $lines = explode("\n",$input);
+    foreach($lines as $line){
+        $tabs = "";
+        for($i = 0;$i<$indent;$i++){
+        $tabs .= "\t";
+        }
+        $output .= $tabs . $line . "\n";
+    }
+    return $output;
 }
 
 ?>

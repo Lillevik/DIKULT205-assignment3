@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     $title = (isset($_POST['title']) ? strip_tags($_POST['title']) : '');
     $description = (isset($_POST['description']) ? strip_tags($_POST['description']) : '');
     $tags = (isset($_POST['tags']) ? $_POST['tags'] : Array());
+    $nsfw = (isset($_POST['nsfw']) ? true : false);
     $numberOfTags = count($tags);
     if($numberOfTags > 5){
         $err_arr[] = "You can have a maximum of 5 tags.";
@@ -121,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
         } else {
 
             if (move_uploaded_file($_FILES["file-upload"]["tmp_name"], $target_dir . $filename)) {
-                insert_new_post($title, $description, $filename, $_SESSION['id'], $tags);
+                insert_new_post($title, $description, $filename, $_SESSION['id'], $tags, $nsfw);
                 header('Location:./edit_post.php?post=' . $filestring . '&uploadSuccess=true');
                 exit();
             } else {
@@ -166,8 +167,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
                         <i style="margin-right:10px;">Select image file</i>
                     </div>
                 </label>
+                <label for="nsfw">Not safe for work?</label>
+                <input type="checkbox" name="nsfw" id="nsfw" value="nsfw">
                 <input id="file-upload" type="file" name="file-upload"/>
-                <p>Select between 1 to 5 tags for your post. An accurate title and use of relevant
+                <p class="info">Select between 1 to 5 tags for your post. An accurate title and use of relevant
                 tags helps others explore your post.</p>
 
                 <?php

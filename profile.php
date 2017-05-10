@@ -55,8 +55,19 @@ if(isset($username) && !empty($username)){
                 <p class=\"profile-detail\">
                     Likes: <span id=\"total-likes\">{$posts_info['total_likes']}</span>
                 </p>
-            </section>
-        </section>";
+            </section>";
+            if(isset($_SESSION['id']) AND $_SESSION['username'] == $username) {
+                echo "<details>
+                        <summary>
+                            Your favourites
+                        </summary>
+                        <ul>";
+                            echo_user_favourites();
+                echo   "</ul>
+                      </details>";
+
+            }
+            echo "</section>" . PHP_EOL;
         }else{
             if(isset($_SESSION['username'])){
                 echo "<p>No user found, click <a href='./profile.php'>here</a> for your own profile.</p>";

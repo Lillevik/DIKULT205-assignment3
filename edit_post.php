@@ -25,9 +25,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         $filename = $post_array['post_key'] . $post_array['extension'];
         $user_id = $post_array['user_id'];
         $editSuccess = (isset($_GET['success']) ? true:false);
-        if($_SESSION['id'] != $user_id){
-            echo "This is not your post, shame on you...";
-            exit();
+        if($_SESSION['rank'] != 'admin'){
+            if($_SESSION['id'] != $user_id){
+                echo "This is not your post, shame on you...";
+                exit();
+            }
         }
     }
 }else if($_SERVER['REQUEST_METHOD'] == 'POST'){
@@ -38,9 +40,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     //Remove script tags and add newline
     $title = strip_tags($raw_title);
     $description = strip_tags($raw_description);
+
+
+    $nsfw = (isset($_POST['nsfw']) ? true : false);
     $post_id_or_key = (isset($_GET['post']) ? $_GET['post'] : null);
     $tags = $_POST['tags'];
-    update_post($title, $description, $post_id_or_key, $tags);
+    update_post($title, $description, $post_id_or_key, $tags, $nsfw);
     header('Location: edit_post.php?post=' . $post_id_or_key . "&success=true");
     exit();
 }
@@ -83,7 +88,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
             <label for="description" class="inputlabel">Description</label>
             <textarea id="description" name="description" placeholder="Enter a short describing text for your post..." maxlength="300"><?php echo (isset($description)? $description : "") ?></textarea>
             <div id="description-chars"><span id="number-of-description-chars"><?php echo (isset($description)? strlen($description) : "") ?></span> of 300 characters.</div>
-            <p>Select between 1 to 5 tags for your post. An accurate title and use of relevant
+            <label for="nsfw" title="This wil blur your post so other users can choose to view it.">Not safe for work?</label>
+            <input type="checkbox" name="nsfw" id="nsfw" value="nsfw">
+            <p class="info">Select between 1 to 5 tags for your post. An accurate title and use of relevant
                 tags helps others explore your post.</p>
             <?php echo_tags(get_post_tags($post_id_or_key))?>
             <section id="buttons">

@@ -47,6 +47,7 @@ class Post{
     var $extension;
     var $post_key;
     var $user_id;
+    var $nsfw;
     var $username;
     var $avatar;
     var $likes_id;
@@ -68,7 +69,7 @@ class Post{
      * @param null $liked_id
      * @param null $favourite_id
      */
-    function __construct($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $username = 'anon', $avatar = null, $liked_id = null, $favourite_id = null) {
+    function __construct($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $nsfw, $username = 'anon', $avatar = null, $liked_id = null, $favourite_id = null) {
         $this->id = $id;
         $this->title = $title;
         $this->description = $description;
@@ -77,6 +78,7 @@ class Post{
         $this->extension = $extension;
         $this->post_key = $post_key;
         $this->user_id = $user_id;
+        $this->nsfw = $nsfw;
         $this->username = $username;
         $this->avatar = $avatar;
         $this->liked_id = $liked_id;
@@ -270,7 +272,7 @@ function validate_login($username_or_email, $password){
  * @param $userid - the post authors user's id
  * @param $tags - An array of tags for the post
  */
-function insert_new_post($title, $description, $filename, $userid, $tags){
+function insert_new_post($title, $description, $filename, $userid, $tags, $nsfw){
     $conn = get_conn();
     $now = date("Y-m-d H:i:s");
 
@@ -279,8 +281,8 @@ function insert_new_post($title, $description, $filename, $userid, $tags){
     $extension = "." . $name_arr[1];
 
     /* Prevent sqlinjection */
-    $stmt = $conn->prepare('INSERT INTO posts (title, description, added, extension, post_key, user_id) VALUES (?, ?, ?, ?, ?, ?);');
-    $stmt->bind_param('sssssi', $title, $description, $now, $extension, $post_key, $userid);
+    $stmt = $conn->prepare('INSERT INTO posts (title, description, added, extension, post_key, user_id, nsfw) VALUES (?, ?, ?, ?, ?, ?, ?);');
+    $stmt->bind_param('sssssis', $title, $description, $now, $extension, $post_key, $userid, $nsfw);
 
     /* Execute prepared statement */
     $stmt->execute();
@@ -330,7 +332,7 @@ function get_posts($offset = 1, $searchQuery = '', $tagSearch = '', $username = 
 
         if(isset($username)){
             /* Prepare statement to prevent sqlinjection */
-            if($smnt = $conn->prepare('SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, users.avatar, posts.user_id, likes.user_id, favourites.user_id
+            if($smnt = $conn->prepare('SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, users.avatar, posts.user_id, posts.nsfw, likes.user_id, favourites.user_id
                                        FROM users
                                        JOIN posts ON (posts.user_id = users.id) 
                                        LEFT JOIN likes ON (likes.user_id = ? AND posts.id = likes.post_id)
@@ -342,12 +344,12 @@ function get_posts($offset = 1, $searchQuery = '', $tagSearch = '', $username = 
                 $smnt->execute();
 
                 $smnt->store_result();
-                $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $avatar, $user_id, $liked_id, $favourite_id);
+                $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $avatar, $user_id, $nsfw, $liked_id, $favourite_id);
 
 
                 /* Adds post objects to a list */
                 while ($smnt->fetch()) {
-                    $posts[] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $username, $avatar, $liked_id, $favourite_id);
+                    $posts[] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $nsfw, $username, $avatar, $liked_id, $favourite_id);
                 }
             }else{
                 echo $conn->error;
@@ -356,7 +358,7 @@ function get_posts($offset = 1, $searchQuery = '', $tagSearch = '', $username = 
 
         }else {
             /* Prepare statement to prevent sqlinjection */
-            $smnt = $conn->prepare('SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, users.avatar, posts.user_id, likes.user_id, favourites.user_id
+            $smnt = $conn->prepare('SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, users.avatar, posts.nsfw,posts.user_id, likes.user_id, favourites.user_id
                                        FROM posts
                                        JOIN users ON (posts.user_id = users.id ) 
                                        LEFT JOIN likes ON (likes.user_id = ? AND posts.id = likes.post_id)
@@ -367,12 +369,12 @@ function get_posts($offset = 1, $searchQuery = '', $tagSearch = '', $username = 
             $smnt->execute();
 
             $smnt->store_result();
-            $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $avatar, $user_id, $liked_id, $favourite_id);
+            $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $avatar,$nsfw, $user_id, $liked_id, $favourite_id);
 
 
             /* Adds post objects to a list */
             while ($smnt->fetch()) {
-                $posts[] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $username, $avatar, $liked_id, $favourite_id);
+                $posts[] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $nsfw,$username, $avatar, $liked_id, $favourite_id);
             }
         }
     }
@@ -413,29 +415,40 @@ function echo_posts($posts){
     foreach($posts as $post){
         $avatar = (isset($post->avatar) ? "./avatars/" . $post->avatar : "./images/profile.png");
         $cropped_image = $post->post_key . 'c' . $post->extension;
-        echo '<section class="post-wrapper">
-                    <h1 class="post-title">'. $post->title .'</h1>
-                    <a href="./post.php?key='.$post->post_key.'">
-                    <img class="post-image" src="./uploadsfolder/' . $cropped_image . '">' .
-                    '</a>' .
-                '<section class="details">
-                                    <p class="post-description">' .nl2br($post->description) . '</p><hr>' .
-                    '<time class="date">Added:'. date("d/m/Y", strtotime($post->added)).'</time>' .
-                    '<p class="likes">
-                        <i class="fa fa-star' . (isset($post->favourite_id) ? "":"-o") . '" id="'.$post->id.'" onclick="favourite_post(this)"></i>
-                        <i class="fa fa-heart'.(isset($post->liked_id) ? "" : "-o") .'" id="'.$post->id.'"  onclick="like_post(this)"></i>
-                        <span id="likes_count_'.$post->id.'">'.$post->likes.'</span> likes
-                    </p>' .
-                    '<div class="profile-wrapper">
-                        <img class="profile-image" src="'.$avatar.'">
-                        <a href="./profile.php?user='.$post->username.'"><p class="post-username">'.$post->username . '</p></a>'
-                        . ($logged_in_user_id == $post->user_id ?
-                        '<a href="./edit_post.php?post='.$post->id.'">
-                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-                         </a>' : null) .
-                    '</div>
-                </section>'  .
-            '</section>';
+        $description = add_line_indents(nl2br($post->description), 6);
+        $rank = (isset($_SESSION['rank'])? $_SESSION['rank']:'');
+        echo "<section class='post-wrapper'>
+                   <h1 class='post-title'>{$post->title}</h1>
+                   <a href='./post.php?key=$post->post_key'>
+                       <div class='img-wrapper'>
+                           <img id='{$post->post_key}' class='post-image ".($post->nsfw ? 'nsfw':'')."' src='./uploadsfolder/$cropped_image'>
+                       </div>
+                   </a>
+                <section class='details'>
+                    <p class='post-description'>\n$description\t\t\t\t\t</p>
+                    <hr>
+                    ".($post->nsfw ?
+                    '<button class="nsfw-button" onclick="show_nsfw('."'".$post->post_key."', this".')">Click to view nsfw post</button>':'')."
+                    <time class='date'>Added: " . date('d/m/Y', strtotime($post->added)) . "</time>
+                    <p class='likes'>
+                        <i class='fa fa-star" .(isset($post->favourite_id) ? '':'-o') . "' id='$post->id' onclick='favourite_post(this)'></i>
+                        <i class='fa fa-heart".(isset($post->liked_id) ? '' : '-o'). "' id='$post->id'  onclick='like_post(this)'></i>
+                        <span id='likes_count_$post->id'>{$post->likes}</span> likes
+                    </p>
+                    <div class='profile-wrapper'>
+                        <img class='profile-image' src='$avatar'>
+                        <a href='./profile.php?user=$post->username'>
+                            <p class='post-username'>$post->username</p>
+                        </a>"
+                        .
+                        //Check if the logged in user owns the post or if the user is admin
+                        (($logged_in_user_id == $post->user_id OR $rank == 'admin') ?
+                        "<a href='./edit_post.php?post=$post->id'>
+                            <i class='fa fa-pencil-square-o' aria-hidden='true'></i>
+                         </a>" : null) .
+                    "\r\n\t\t\t\t\t</div>
+                </section>\r\n\t\t"  .
+            "</section>\r\n\n\t";
     }
 }
 
@@ -470,7 +483,7 @@ function get_profile_info($username){
                 $total_likes += $post->likes;
             }
 
-            //Return array of post objects, total likes and total posts.
+            //Return array of post objects, total likes, total posts and avatar.
             $post_arr['posts'] = $posts;
             $post_arr['total_likes'] = $total_likes;
             $post_arr['total_posts'] = $total_posts;
@@ -549,7 +562,6 @@ function insert_favourite_or_like($post_id, $user_id, $favourite_or_like_table){
         }else{
             return false;
         }
-
     }
 }
 
@@ -642,7 +654,7 @@ function delete_post($post_id_or_key){
  * @param $post_id_or_key
  * @param $tags
  */
-function update_post($title, $description, $post_id_or_key, $tags){
+function update_post($title, $description, $post_id_or_key, $tags, $nsfw){
     $conn = get_conn();
 
     $queryParam = null;
@@ -653,8 +665,8 @@ function update_post($title, $description, $post_id_or_key, $tags){
     }
 
     /* Prepare statement and prevent sqlinjection */
-    $stmt = $conn->prepare('UPDATE posts SET title = ?, description = ? WHERE '.$queryParam.' = ?;');
-    $stmt->bind_param('ssi', $title, $description, $post_id_or_key);
+    $stmt = $conn->prepare('UPDATE posts SET title = ?, description = ? , nsfw = ? WHERE '.$queryParam.' = ?;');
+    $stmt->bind_param('sssi', $title, $description, $nsfw, $post_id_or_key);
 
     /* Execute prepared statement */
     $stmt->execute();
@@ -883,7 +895,7 @@ function get_posts_before_and_after($post_key){
     $user_id = (isset($_SESSION['id']) ? $_SESSION['id'] : 0);
 
     /* Prevent sqlinjection using prepared statement */
-    $smnt = $conn->prepare('SELECT posts.id, posts.title, posts.description, posts.likes, posts.favourites, posts.added, posts.extension, posts.post_key, posts.user_id, likes.user_id, favourites.user_id
+    $smnt = $conn->prepare('SELECT posts.id, posts.title, posts.description, posts.likes, posts.favourites, posts.added, posts.extension, posts.post_key, posts.user_id, posts.nsfw, likes.user_id, favourites.user_id
                                    FROM posts
                                    LEFT JOIN likes ON (likes.post_id = posts.id AND likes.user_id = ?)
                                    LEFT JOIN favourites ON (favourites.post_id = posts.id AND favourites.user_id = ?)
@@ -891,7 +903,7 @@ function get_posts_before_and_after($post_key){
     $smnt->bind_param('iis', $user_id, $user_id, $post_key);
     $smnt->execute();
 
-    $smnt->bind_result($id, $title, $description, $likes, $favourites, $added, $extension, $post_key, $user_id, $liked, $is_favourite);
+    $smnt->bind_result($id, $title, $description, $likes, $favourites, $added, $extension, $post_key, $user_id, $nsfw, $liked, $is_favourite);
 
     if($smnt->fetch()) {
         //TODO Create an object instead
@@ -906,6 +918,7 @@ function get_posts_before_and_after($post_key){
         $post_arr['extension'] = $extension;
         $post_arr['post_key'] = $post_key;
         $post_arr['user_id'] = $user_id;
+        $post_arr['nsfw'] = $nsfw;
         $post_arr['liked'] = $liked;
         $post_arr['is_favourite'] = $is_favourite;
         $post_arr['current'] = $post_arr;
@@ -1129,9 +1142,10 @@ function update_user_avatar($user_id, $avatar){
  * on the index page as paragraphs.
  *
  * //TODO should just get the favourites and not echo them - seperate functionality
- * @return bool
+ * @param bool $data
+ * @return array
  */
-function echo_user_favourites(){
+function echo_user_favourites($data = false){
     $conn = get_conn();
     $user_id = $_SESSION['id'];
     if(isset($user_id)){
@@ -1144,9 +1158,22 @@ function echo_user_favourites(){
             $smnt->store_result();
             $smnt->bind_result($title, $key);
             if($smnt->num_rows > 0){
-                while($smnt->fetch()){
-                    echo "<li class='right-list-item'><a href='./post.php?key=$key'>$title</a></li>";
+                if($data){
+                    $arr = Array();
+                    while($smnt->fetch()){
+                        $arr[] =    "<li class='right-list-item'>
+                                        <a href='./post.php?key=$key'>$title</a>
+                                    </li>";
+                    }
+                    return $arr;
+                }else{
+                    while($smnt->fetch()){
+                        echo    "<li class='right-list-item'>
+                                    <a href='./post.php?key=$key'>$title</a>
+                                </li>";
+                    }
                 }
+
             }else{
                 echo "<p>You have no favourites yet. Go ahead and add some by clicking the star icon!</p>";
             };
@@ -1323,7 +1350,7 @@ function search($query, $con = null){
 
     $posts = Array();
     $param = "%$query%";
-    if($stmt = $conn->prepare("SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, posts.user_id, likes.user_id, favourites.user_id
+    if($stmt = $conn->prepare("SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, posts.user_id, posts.nsfw, likes.user_id, favourites.user_id
                                       FROM post_tags
                                       JOIN tags ON  post_tags.tag_id = tags.id
                                       JOIN posts ON  (post_tags.post_id = posts.id OR posts.title LIKE ?)
@@ -1333,10 +1360,10 @@ function search($query, $con = null){
                                       WHERE posts.title LIKE ? OR tags.tag_name LIKE ?;")){
         $stmt->bind_param('siiss', $param, $logged_in_user_id, $logged_in_user_id, $param, $param);
         $stmt->execute();
-        $stmt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $user_id, $liked_id, $favourite_id);
+        $stmt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $user_id,$nsfw, $liked_id, $favourite_id);
         while($stmt->fetch()){
             if(!array_key_exists($id, $posts)){
-                $posts[$id] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $username, $liked_id, $favourite_id);
+                $posts[$id] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $nsfw,$username, $liked_id, $favourite_id);
             }
         }
     }
@@ -1358,7 +1385,7 @@ function get_posts_by_tag_name($tag_name, $con = null){
     $logged_in_user_id = (isset($_SESSION['id']) ? $_SESSION['id'] : '');
 
     $posts = Array();
-    if($stmt = $conn->prepare("SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, posts.user_id, likes.user_id, favourites.user_id
+    if($stmt = $conn->prepare("SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, posts.user_id,posts.nsfw likes.user_id, favourites.user_id
                                       FROM post_tags
                                       JOIN tags ON  post_tags.tag_id = tags.id
                                       JOIN posts ON  (post_tags.post_id = posts.id)
@@ -1368,9 +1395,9 @@ function get_posts_by_tag_name($tag_name, $con = null){
                                       WHERE tags.tag_name = ?")){
         $stmt->bind_param('iis',  $logged_in_user_id, $logged_in_user_id, $tag_name);
         $stmt->execute();
-        $stmt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $user_id, $liked_id, $favourite_id);
+        $stmt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $user_id, $nsfw,$liked_id, $favourite_id);
         while($stmt->fetch()){
-            $posts[$id] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $username, $liked_id, $favourite_id);
+            $posts[$id] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $nsfw,$username, $liked_id, $favourite_id);
         }
     }
     return $posts;

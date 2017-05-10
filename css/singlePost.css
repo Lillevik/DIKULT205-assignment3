@@ -71,6 +71,11 @@ main{
     max-width: 100%;
 }
 
+.nsfw{
+    -webkit-filter:blur(30px);
+    filter:blur(30px);
+}
+
 #description{
     min-height: 30px;
     padding-top:10px;
@@ -80,7 +85,6 @@ main{
 #description p{
     margin:1px;
 }
-
 
 /* react section */
 #react-section{

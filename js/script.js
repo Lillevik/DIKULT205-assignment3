@@ -39,6 +39,38 @@ window.onload = function(){
         footer.css("bottom", "0");
         rightCon.css({'position':'absolute','right':'0', 'z-index':999, 'top':'-43px'})
     }
+
+    var links = document.querySelectorAll('.nsfw');
+    for(var i = 0;i<links.length;i++){
+        links[i].addEventListener('click', function(e){e.preventDefault();})
+    }
 };
 
+function show_nsfw(key, button){
+    var img = document.getElementById(key);
+    img.classList.toggle('nsfw');
+    var link = img.parentNode;
+    if(img.classList.contains('nsfw')){
+        link.removeEventListener('click', function(e){});
+
+        //Remove action listeners
+        elClone = link.cloneNode(true);
+        link.parentNode.replaceChild(elClone, link);
+
+        elClone.addEventListener('click', function(e){e.preventDefault();})
+        button.style.background = '#FFA5A9';
+        button.innerHTML = 'Click to view nsfw post';
+    }else{
+        elClone = link.cloneNode(true);
+        link.parentNode.replaceChild(elClone, link);
+        elClone.addEventListener('click',function (e) {
+            console.log('works')
+            return true;
+        });
+        button.style.background = '#ADFFA3';
+        button.innerHTML = 'Click to hide nsfw post';
+
+    }
+
+}
 
