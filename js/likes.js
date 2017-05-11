@@ -44,6 +44,8 @@ function like_post(element) {
                         element.classList.add('fa-heart');
                     }else if(data === 'Access denied'){
                         alert('You need to login to like posts.')
+                    }else if(data === 'error'){
+                        alert('An error occurred.')
                     }
                 }
             });
@@ -65,6 +67,8 @@ function like_post(element) {
                         }, 200)
                     }else if(data == 'Access denied'){
                         alert('You need to login to like posts.')
+                    }else if(data === 'error'){
+                        alert('An error occurred.')
                     }
 
                 }

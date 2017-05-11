@@ -6,8 +6,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     $post_id = $_POST['data'];
     if(isset($_SESSION['logged_in'])){
         require '../../dbHandling.php';
-        insert_favourite_or_like($post_id, $_SESSION['id'], "favourites");
-        echo 'Success';
+        if(insert_favourite_or_like($post_id, $_SESSION['id'], "favourites")){
+            echo 'Success';
+        }else{
+            echo 'error';
+        };
     }else{
         echo "Access denied";
     }

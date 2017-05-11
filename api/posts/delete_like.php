@@ -4,8 +4,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(isset($_SESSION['logged_in'])){
         require '../../dbHandling.php';
         $post_id = $_POST['data'];
-        delete_favourite_or_like($post_id, $_SESSION['id'], "likes");
-        echo 'Success';
+        if(delete_favourite_or_like($post_id, $_SESSION['id'], "likes")){
+            echo 'Success';
+        }else{
+            echo 'error';
+        }
     }else{
         echo "Access denied";
     }

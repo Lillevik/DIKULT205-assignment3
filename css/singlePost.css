@@ -52,6 +52,10 @@ main{
         justify-content: space-around;
 }
 
+.post-title{
+    font-size: 20px;
+}
+
 #img-element-wrapper{
     max-height: 100%;
     max-width: 100%;

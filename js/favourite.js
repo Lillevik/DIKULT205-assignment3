@@ -32,6 +32,8 @@ function favourite_post(element) {
                         element.classList.add('fa-star');
                     }else if(data === 'Access denied'){
                         alert('You need to login to favourite posts.')
+                    }else if(data === 'error'){
+                        alert('An error occurred.')
                     }
                 }
             });
@@ -49,6 +51,8 @@ function favourite_post(element) {
                         element.classList.add('fa-star-o');
                     }else if(data === 'Access denied'){
                         alert('You need to login to favourite posts.')
+                    }else if(data === 'error'){
+                        alert('An error occurred.')
                     }
 
                 }

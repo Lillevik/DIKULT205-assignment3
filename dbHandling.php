@@ -338,7 +338,7 @@ function get_posts($offset = 1, $searchQuery = '', $tagSearch = '', $username = 
                                        LEFT JOIN likes ON (likes.user_id = ? AND posts.id = likes.post_id)
                                        LEFT JOIN favourites ON (favourites.user_id = ? AND posts.id = favourites.post_id)
                                        WHERE users.username = ?
-                                       ORDER BY posts.id ASC;')){
+                                       ORDER BY posts.id DESC;')){
             /* Bind parameters */
             $smnt->bind_param('iis', $logged_in_user_id, $logged_in_user_id, $username);
             $smnt->execute();
@@ -504,6 +504,7 @@ function get_profile_info($username){
  * @param $post_id
  * @param $user_id
  * @param $favourite_or_like_table
+ * @return bool on success
  */
 function delete_favourite_or_like($post_id, $user_id, $favourite_or_like_table){
     $conn = get_conn();
@@ -512,19 +513,26 @@ function delete_favourite_or_like($post_id, $user_id, $favourite_or_like_table){
     $stmt = $conn->prepare('DELETE FROM '.$favourite_or_like_table.' WHERE post_id = ? AND user_id = ?;');
     $stmt->bind_param('ii', $post_id, $user_id);
 
-    $stmt1 = $conn->prepare('UPDATE posts SET '.$favourite_or_like_table.' = '.$favourite_or_like_table.' - 1 WHERE id = ?;');
-    $stmt1->bind_param('i', $post_id);
+    if($stmt->execute()){
+        $stmt1 = $conn->prepare('UPDATE posts SET '.$favourite_or_like_table.' = '.$favourite_or_like_table.' - 1 WHERE id = ?;');
+        $stmt1->bind_param('i', $post_id);
 
-    /* Execute prepared statement */
-    $stmt->execute();
-    $stmt1->execute();
+        /* Execute prepared statement */
+        $stmt1->execute();
 
-    $conn->commit();
+        $conn->commit();
 
-    /* Close db connection and statement*/
-    $stmt->close();
-    $stmt1->close();
-    $conn->close();
+        /* Close db connection and statement*/
+        $stmt->close();
+        $stmt1->close();
+        $conn->close();
+        return true;
+    }else{
+        $stmt->close();
+        $conn->close();
+        return false;
+    }
+
 }
 
 /**
@@ -535,7 +543,7 @@ function delete_favourite_or_like($post_id, $user_id, $favourite_or_like_table){
  * @param $post_id
  * @param $user_id
  * @param $favourite_or_like_table
- * @return bool
+ * @return bool on success
  */
 function insert_favourite_or_like($post_id, $user_id, $favourite_or_like_table){
     // Get a database connection
@@ -558,6 +566,8 @@ function insert_favourite_or_like($post_id, $user_id, $favourite_or_like_table){
             $conn->close();
             return true;
         }else{
+            $stmt->close();
+            $conn->close();
             return false;
         }
     }
