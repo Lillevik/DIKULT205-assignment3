@@ -95,15 +95,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         <section id="next-page-section">
 
             <?php
+
             if(empty($query)) {
                 $totalPages = $results['totalPages'];
                 $previous = $page - 1;
                 $next = $page + 1;
 
-
                 echo "<ul id='pages-list'>";
                 $max = (($page + 5) > $totalPages ? $totalPages : ($page + 5));
                 $start = (($page - 5) > 0 ? ($page - 5) : 0);
+
+
 
 
                 if ($max == $totalPages && $max - 10 > 0) {
@@ -111,6 +113,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 } elseif ($start == 0 && $start + 10 < $totalPages) {
                     $max = 10;
                 }
+
                 echo($previous > 0 ? "<li class='page-list-element bottom-navigation'><a href='./?page=$previous'><-Prev</a></li>" : null);
                 for ($i = $start; $i < $max; $i++) {
                     $p = ($i + 1);

@@ -312,9 +312,11 @@ function insert_new_post($title, $description, $filename, $userid, $tags, $nsfw)
  * If the query parameter is given, the search function is executed and
  * returns a list of posts that matches the search query.
  *
- * @param $offset
+ * @param int $offset
  * @param string $searchQuery
  * @param string $tagSearch
+ * @param null $username
+ * @param null $con
  * @return array
  */
 function get_posts($offset = 1, $searchQuery = '', $tagSearch = '', $username = null, $con = null){
@@ -328,61 +330,57 @@ function get_posts($offset = 1, $searchQuery = '', $tagSearch = '', $username = 
         $posts = search($searchQuery, $conn);
     }else if(!empty($tagSearch)){
         $posts = get_posts_by_tag_name($tagSearch, $conn);
-    }else{
-
-        if(isset($username)){
-            /* Prepare statement to prevent sqlinjection */
-            if($smnt = $conn->prepare('SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, users.avatar, posts.user_id, posts.nsfw, likes.user_id, favourites.user_id
+    }else if(isset($username)) {
+        /* Prepare statement to prevent sqlinjection */
+        if($smnt = $conn->prepare('SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, users.avatar, posts.user_id, posts.nsfw, likes.user_id, favourites.user_id
                                        FROM users
                                        JOIN posts ON (posts.user_id = users.id) 
                                        LEFT JOIN likes ON (likes.user_id = ? AND posts.id = likes.post_id)
                                        LEFT JOIN favourites ON (favourites.user_id = ? AND posts.id = favourites.post_id)
                                        WHERE users.username = ?
                                        ORDER BY posts.id ASC;')){
-                /* Bind parameters */
-                $smnt->bind_param('iis', $logged_in_user_id, $logged_in_user_id, $username);
-                $smnt->execute();
-
-                $smnt->store_result();
-                $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $avatar, $user_id, $nsfw, $liked_id, $favourite_id);
-
-
-                /* Adds post objects to a list */
-                while ($smnt->fetch()) {
-                    $posts[] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $nsfw, $username, $avatar, $liked_id, $favourite_id);
-                }
-            }else{
-                echo $conn->error;
-            }
-
-
-        }else {
-            /* Prepare statement to prevent sqlinjection */
-            $smnt = $conn->prepare('SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, users.avatar, posts.nsfw,posts.user_id, likes.user_id, favourites.user_id
-                                       FROM posts
-                                       JOIN users ON (posts.user_id = users.id ) 
-                                       LEFT JOIN likes ON (likes.user_id = ? AND posts.id = likes.post_id)
-                                       LEFT JOIN favourites ON (favourites.user_id = ? AND posts.id = favourites.post_id)
-                                       ORDER BY posts.id DESC LIMIT 10 OFFSET ?;');
             /* Bind parameters */
-            $smnt->bind_param('iii', $logged_in_user_id, $logged_in_user_id, $offset);
+            $smnt->bind_param('iis', $logged_in_user_id, $logged_in_user_id, $username);
             $smnt->execute();
 
             $smnt->store_result();
-            $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $avatar,$nsfw, $user_id, $liked_id, $favourite_id);
+            $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $avatar, $user_id, $nsfw, $liked_id, $favourite_id);
 
 
             /* Adds post objects to a list */
             while ($smnt->fetch()) {
-                $posts[] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $nsfw,$username, $avatar, $liked_id, $favourite_id);
+                $posts[] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $nsfw, $username, $avatar, $liked_id, $favourite_id);
             }
+        }else{
+            echo $conn->error;
         }
     }
+    else {
+        /* Prepare statement to prevent sqlinjection */
+        $smnt = $conn->prepare('SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, users.avatar, posts.nsfw,posts.user_id, likes.user_id, favourites.user_id
+                                   FROM posts
+                                   JOIN users ON (posts.user_id = users.id ) 
+                                   LEFT JOIN likes ON (likes.user_id = ? AND posts.id = likes.post_id)
+                                   LEFT JOIN favourites ON (favourites.user_id = ? AND posts.id = favourites.post_id)
+                                   ORDER BY posts.id DESC LIMIT 10 OFFSET ?;');
+        /* Bind parameters */
+        $smnt->bind_param('iii', $logged_in_user_id, $logged_in_user_id, $offset);
+        $smnt->execute();
+
+        $smnt->store_result();
+        $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $avatar,$nsfw, $user_id, $liked_id, $favourite_id);
+
+
+        /* Adds post objects to a list */
+        while ($smnt->fetch()) {
+            $posts[] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $nsfw,$username, $avatar, $liked_id, $favourite_id);
+        }
+    }
+
     $current_rows = count($posts);
 
 
-
-    if(empty($searchQuery) && $username = null){
+    if(empty($searchQuery) AND !is_null($username)){
         $smnt1 = $conn->prepare('SELECT COUNT(id) FROM posts;');
         $smnt1->execute();
         $smnt1->bind_result($id);
