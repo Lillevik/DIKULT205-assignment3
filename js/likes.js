@@ -77,39 +77,52 @@ function like_post(element) {
     }
 }
 
+/*
+ var id = this.className.split(/\s+/)[0];
+ var element = this;
+ if(likes_window !== null){
+ likes_window = $('div');
+ likes_window.attr('id', 'likes-window')
+ }else{
+ likes_window = $('div');
+ likes_window.attr('id', 'likes-window')
+ }
+ var likes_window = $('#likes-window');
+ */
+
 
 $(document).ready(function () {
-    $(".likes_number").hover(function() {
-        var id = this.className.split(/\s+/)[0];
+    $(".display_likes").hover(function() {
+        var likes_container = $($(this).find('.user_likes')[0]);
+        var id = likes_container.attr('id');
         var element = this;
         var likes_window = $('#likes-window');
         likes_window.empty();
-        $.ajax({
-            'type': 'get',
-            'url': '/api/posts/get_likes.php?post=' + id,
-            success: function (data) {
-                var y = $(window).height() - element.offsetTop - element.offsetHeight;
-                var x = element.offsetLeft;
 
+        if(likes_container.html() === ""){
+            $.ajax({
+                'type': 'get',
+                'url': '/api/posts/get_likes.php?post=' + id,
+                success: function (data) {
+                    if(data.usernames.length > 0){
+                        var names_list = $('<ul></ul>');
+                        names_list.addClass('tooltiptext');
+                        for(var i = 0;i < data.usernames.length;i++){
+                            var name_element = $('<li></li>');
+                            name_element.addClass('username');
+                            name_element.html(data.usernames[i]);
+                            likes_container.append(name_element);
+                        }
+                    }else{
+                        likes_container.append("<li>No likes.</li>")
+                    }
 
-                likes_window[0].style.bottom = (y) + 'px';
-                likes_window[0].style.left = (x) + 'px';
-                var name_list = data['usernames'];
-                for(var i = 0; i<name_list.length;i++){
-                    likes_window.append('<li class="like-name">' + name_list[i].toString() +  + '</li>');
+                },
+                error:function(){
+                    console.log('error')
                 }
-                likes_window.css({'display':'block'});
-
-            }
+            });
         }
-
-        , function () {
-                likes_window.css('display','none');
-        });
-
     });
-
-
-
 
 });

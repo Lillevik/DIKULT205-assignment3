@@ -52,7 +52,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 echo "</section>";
             }
             ?>
-
         <main>
 
             <div id="post-container">

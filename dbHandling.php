@@ -431,8 +431,12 @@ function echo_posts($posts){
                     <p class='likes'>
                         <i class='fa fa-star" .(isset($post->favourite_id) ? '':'-o') . "' id='$post->id' onclick='favourite_post(this)'></i>
                         <i class='fa fa-heart".(isset($post->liked_id) ? '' : '-o'). "' id='$post->id'  onclick='like_post(this)'></i>
-                        <span id='likes_count_$post->id'>{$post->likes}</span> likes
+                        <span id='likes_count_$post->id' class='likes_number'>{$post->likes}</span> likes
                     </p>
+                    <div class='display_likes tooltip'>
+                        Show likes
+                        <ul class='user_likes tooltiptext' id='{$post->id}'></ul>
+                    </div>
                     <div class='profile-wrapper'>
                         <img class='profile-image' src='$avatar'>
                         <a href='./profile.php?user=$post->username'>
