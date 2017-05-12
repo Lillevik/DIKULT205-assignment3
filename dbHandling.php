@@ -1362,7 +1362,7 @@ function search($query, $con = null){
 
     $posts = Array();
     $param = "%$query%";
-    if($stmt = $conn->prepare("SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, posts.user_id, posts.nsfw, likes.user_id, favourites.user_id
+    if($stmt = $conn->prepare("SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, posts.user_id, posts.nsfw, users.avatar, likes.user_id, favourites.user_id
                                       FROM post_tags
                                       JOIN tags ON  post_tags.tag_id = tags.id
                                       JOIN posts ON  (post_tags.post_id = posts.id OR posts.title LIKE ?)
@@ -1372,10 +1372,10 @@ function search($query, $con = null){
                                       WHERE posts.title LIKE ? OR tags.tag_name LIKE ?;")){
         $stmt->bind_param('siiss', $param, $logged_in_user_id, $logged_in_user_id, $param, $param);
         $stmt->execute();
-        $stmt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $user_id,$nsfw, $liked_id, $favourite_id);
+        $stmt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $user_id,$nsfw, $avatar, $liked_id, $favourite_id);
         while($stmt->fetch()){
             if(!array_key_exists($id, $posts)){
-                $posts[$id] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $nsfw,$username, $liked_id, $favourite_id);
+                $posts[$id] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $nsfw,$username, $avatar, $liked_id, $favourite_id);
             }
         }
     }
@@ -1397,7 +1397,7 @@ function get_posts_by_tag_name($tag_name, $con = null){
     $logged_in_user_id = (isset($_SESSION['id']) ? $_SESSION['id'] : '');
 
     $posts = Array();
-    if($stmt = $conn->prepare("SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, posts.user_id,posts.nsfw likes.user_id, favourites.user_id
+    if($stmt = $conn->prepare("SELECT posts.id, posts.title, posts.description, posts.likes, posts.added, posts.extension, posts.post_key, users.username, posts.user_id, posts.nsfw, users.avatar, likes.user_id, favourites.user_id
                                       FROM post_tags
                                       JOIN tags ON  post_tags.tag_id = tags.id
                                       JOIN posts ON  (post_tags.post_id = posts.id)
@@ -1407,9 +1407,9 @@ function get_posts_by_tag_name($tag_name, $con = null){
                                       WHERE tags.tag_name = ?")){
         $stmt->bind_param('iis',  $logged_in_user_id, $logged_in_user_id, $tag_name);
         $stmt->execute();
-        $stmt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $user_id, $nsfw,$liked_id, $favourite_id);
+        $stmt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $username, $user_id, $nsfw, $avatar, $liked_id, $favourite_id);
         while($stmt->fetch()){
-            $posts[$id] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $nsfw,$username, $liked_id, $favourite_id);
+                $posts[$id] = new Post($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $nsfw, $username, $avatar, $liked_id, $favourite_id);
         }
     }
     return $posts;

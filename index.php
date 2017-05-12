@@ -56,7 +56,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
             <div id="post-container">
                 <?php
-                    echo_posts($posts);
+                    if($posts){
+                        echo_posts($posts);
+                    }else{
+                        echo "No results";
+                    }
+
                 ?>
 
             </div>

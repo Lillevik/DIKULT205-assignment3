@@ -102,7 +102,7 @@ $(document).ready(function () {
         if(likes_container.html() === ""){
             $.ajax({
                 'type': 'get',
-                'url': '/api/posts/get_likes.php?post=' + id,
+                'url': domain + '/api/posts/get_likes.php?post=' + id,
                 success: function (data) {
                     if(data.usernames.length > 0){
                         var names_list = $('<ul></ul>');
