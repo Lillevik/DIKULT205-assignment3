@@ -8,7 +8,7 @@
 include 'functions.php';
 ?>
 
-
+<!DOCTYPE html>
 <html>
     <head>
         <?php echo_metadata() ?>
@@ -19,6 +19,8 @@ include 'functions.php';
         </header>
         <main>
             <p>Nothing to show here at this time.</p>
+            <p>However, as an administrator you are able to edit or delete anyone's posts by clicking the edit icon
+               in the bottom right corner of a post.</p>
         </main>
     </body>
 </html>

@@ -83,7 +83,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             <?php
                                 $tags = get_tags();
                                 foreach($tags as $tag){
-                                    echo "<li class='category-link'>
+                                    echo "<li class='right-list-item'>
                                               <a href='./index.php?category={$tag['tag_name']}'>{$tag['tag_name']}</a>
                                           </li>";
                                 }

@@ -3,7 +3,7 @@
  */
 
 var workingOnFavourite = false;
-function favourite_post(element) {
+function favourite_post(element, id) {
 
     //Check if another process is already running
     if(!workingOnFavourite){
@@ -11,11 +11,7 @@ function favourite_post(element) {
         //Localhost
         var host_url = domain + "/api/posts/";
 
-        //The post id
-        var id = element.getAttribute("id");
 
-        //The current like count
-        var favouriteCount = $('#favourite_count_' + id);
 
         if (element.classList.contains('fa-star-o')){
             $.ajax({
@@ -23,11 +19,9 @@ function favourite_post(element) {
                 data: {data:id},
                 url: host_url + "add_favourite",
                 success: function(data){
-                    console.log(data);
 
                     workingOnFavourite = false;
                     if(data === 'Success'){
-                        favouriteCount.text(parseInt(favouriteCount.text()) + 1);
                         element.classList.remove('fa-star-o');
                         element.classList.add('fa-star');
                     }else if(data === 'Access denied'){
@@ -46,7 +40,6 @@ function favourite_post(element) {
                 success: function(data){
                     workingOnFavourite = false;
                     if(data === 'Success'){
-                        favouriteCount.text(parseInt(favouriteCount.text()) - 1);
                         element.classList.remove('fa-star');
                         element.classList.add('fa-star-o');
                     }else if(data === 'Access denied'){

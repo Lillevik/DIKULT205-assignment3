@@ -31,7 +31,7 @@ $wrongPass = (isset($_GET['wrongPass'])?$_GET['wrongPass']:null);
 $required = (isset($_GET['required'])?$_GET['required']:null);
 
 ?>
-
+<!DOCTYPE html>
 <body>
     <head>
         <?php echo_metadata() ?>

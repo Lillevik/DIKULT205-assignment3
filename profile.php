@@ -21,7 +21,7 @@ if(isset($username) && !empty($username)){
 }
 ?>
 
-
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -32,6 +32,7 @@ if(isset($username) && !empty($username)){
     <script type="text/javascript" src="./js/config.js"></script>
     <script type="text/javascript" src="./js/likes.js"></script>
     <script type="text/javascript" src="./js/favourite.js"></script>
+    <script type="text/javascript" src="./js/script.js"></script>
 </head>
 
 <body>

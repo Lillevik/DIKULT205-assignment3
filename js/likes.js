@@ -12,8 +12,9 @@ var working = false;
  * and sends an ajax request to the server in order to add
  * or delete a 'like' in the database.
  * @param element - The post to like or unlike.
+ * @param id
  */
-function like_post(element) {
+function like_post(element, id) {
 
     //Check if another process is already running
     if(!working){
@@ -25,8 +26,6 @@ function like_post(element) {
         //Starts the working process
         working = true;
 
-        //The post id
-        var id = element.getAttribute("id");
 
         //The current like count
         var likesCount = $('#likes_count_' + id);

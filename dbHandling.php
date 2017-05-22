@@ -429,8 +429,8 @@ function echo_posts($posts){
                     '<button class="nsfw-button" onclick="show_nsfw('."'".$post->post_key."', this".')">Click to view nsfw post</button>':'')."
                     <time class='date'>Added: " . date('d/m/Y', strtotime($post->added)) . "</time>
                     <p class='likes'>
-                        <i class='fa fa-star" .(isset($post->favourite_id) ? '':'-o') . "' id='$post->id' onclick='favourite_post(this)'></i>
-                        <i class='fa fa-heart".(isset($post->liked_id) ? '' : '-o'). "' id='$post->id'  onclick='like_post(this)'></i>
+                        <i class='fa fa-star" .(isset($post->favourite_id) ? '':'-o') . "' onclick='favourite_post(this,{$post->id})'></i>
+                        <i class='fa fa-heart".(isset($post->liked_id) ? '' : '-o'). "' onclick='like_post(this,{$post->id})'></i>
                         <span id='likes_count_$post->id' class='likes_number'>{$post->likes}</span> likes
                     </p>
                     <div class='display_likes tooltip'>
