@@ -151,7 +151,12 @@ label[for="file-upload"] {
 
 input[type=checkbox]{
     display: none;
-} 
+}
+
+.form-title{
+    font-size: 18px;
+    margin-top:0;
+}
 
 input[type=checkbox]:checked + label {
     background-color:rgba(42,158,172,0.96);

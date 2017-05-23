@@ -1,7 +1,7 @@
-html{
-    min-height:100vh;
-    background-color: #f5f6fa;
+body{
+    min-height: 100vh;
 }
+
 
 text, p, label, span, input, a{
     font-size: 12px;
@@ -35,6 +35,7 @@ input{
     max-width: 100%;
     border: 1px solid grey;
     border-radius:2px;
+    box-sizing: border-box;
     box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.75);
 }
 
@@ -46,6 +47,7 @@ input{
     margin: 10px auto 0;
     font-size: 12px;
     max-width: 100%;
+    box-sizing: border-box;
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 

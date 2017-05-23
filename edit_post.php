@@ -23,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         $title = $post_array['title'];
         $description = strip_tags($post_array['description']);
         $filename = $post_array['post_key'] . $post_array['extension'];
+        $nsfw = $post_array['nsfw'];
         $user_id = $post_array['user_id'];
         $editSuccess = (isset($_GET['success']) ? true:false);
         if($_SESSION['rank'] != 'admin'){
@@ -71,6 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
             <?php get_navigation(); ?>
         </header>
         <form action="edit_post.php?post=<?php echo $id ?>" id="post-form" method="POST" enctype="multipart/form-data">
+            <h1 class="form-title">Edit Post</h1>
             <?php
             if($uploadSuccess){
                 echo '<p>Post was successful.</p>';
@@ -89,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
             <textarea id="description" name="description" placeholder="Enter a short describing text for your post..." maxlength="300"><?php echo (isset($description)? $description : "") ?></textarea>
             <div id="description-chars"><span id="number-of-description-chars"><?php echo (isset($description)? strlen($description) : "") ?></span> of 300 characters.</div>
             <label for="nsfw" title="This wil blur your post so other users can choose to view it.">Not safe for work?</label>
-            <input type="checkbox" name="nsfw" id="nsfw" value="nsfw">
+            <input type="checkbox" name="nsfw" id="nsfw" value="nsfw" <?php echo ($nsfw ? 'checked':'')?>>
             <p class="info">Select between 1 to 5 tags for your post. An accurate title and use of relevant
                 tags helps others explore your post.</p>
             <?php echo_tags(get_post_tags($post_id_or_key))?>

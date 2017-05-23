@@ -39,16 +39,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
             <?php
             $query = (isset($_GET['query']) ? $_GET['query'] : '');
+            $category = (isset($_GET['category']) ? $_GET['category']:'');
             $tagQuery = (isset($_GET['category']) ? $_GET['category'] : '');
             $page = (isset($_GET['page']) ? intval($_GET['page']) : 1);
             $results = get_posts($page, $query, $tagQuery);
             $posts = $results['posts'];
-
+            $numberOfResults = count($posts);
             if(!empty($query)){
                 echo "<section id=\"search-results\">";
-                $numberOfResults = count($posts);
                 echo "<h2>You searched for: $query</h2>";
                 echo "<p>Total results: $numberOfResults</p>";
+                echo "</section>";
+            }else if(!empty($category)){
+                echo "<section id=\"search-results\">";
+                echo "<h2>Category: $category</h2>";
+                echo "<p>Total posts: $numberOfResults</p>";
                 echo "</section>";
             }
             ?>
@@ -59,7 +64,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     if($posts){
                         echo_posts($posts);
                     }else{
-                        echo "No results";
+                        echo "<section class='post-wrapper'><h2>No results</h2></section>";
                     }
 
                 ?>

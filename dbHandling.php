@@ -597,7 +597,7 @@ function get_post_info($post_id_or_key){
         $bindParam = 's';
     }
     /* Prepare statement and prevent sqlinjection */
-    if($smnt = $conn->prepare('SELECT id, title, description, likes, added, extension, post_key, user_id
+    if($smnt = $conn->prepare('SELECT id, title, description, likes, added, extension, post_key, user_id, nsfw
                                    FROM posts
                                    WHERE posts.'.$queryParam.' = ? limit 1;')){
         //Bind query parameters and execute query
@@ -606,7 +606,7 @@ function get_post_info($post_id_or_key){
 
         //Store and bind result
         $smnt->store_result();
-        $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $user_id);
+        $smnt->bind_result($id, $title, $description, $likes, $added, $extension, $post_key, $user_id, $nsfw);
 
         $post_array = Array();
         if($smnt->fetch()) {
@@ -618,6 +618,7 @@ function get_post_info($post_id_or_key){
             $post_array['post_key'] = $post_key;
             $post_array['extension'] = $extension;
             $post_array['user_id'] = $user_id;
+            $post_array['nsfw'] = $nsfw;
             return $post_array;
         }else{
             return false;

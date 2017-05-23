@@ -36,9 +36,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="./css/menu.css">
+        <?php echo_metadata()?>
         <link rel="stylesheet" href="./css/passwordReset.css">
     </head>
     <body>
@@ -49,10 +47,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         if(!isset($_GET['token'])){
             echo '
             <form action="./forgotPassword.php?forgot=true" method="post" class="password-form">
-                <label for="emailField" class="inputlabel">Email-address</label>
+                <p style="width: 90%;margin: 10px auto auto;">Enter your email address to recieve a password reset link.</p>
+                <label for="emailField" class="inputlabel">Email-address<span class="required" style="color:red;">*</span></label>
                 <input type="text" id="emailField" class="input-field" name="email" placeholder="someone@example.com">
                 <input type="submit" value="Send" class="submit-button">
-                '. (isset($_GET['success']) ? '<p class="infoMessage">If the email is in our system, we have sent a link to reset it.</p>' : '') . '
+                ' . (isset($_GET['success']) ? '<p class="infoMessage">An email to reset the password should have been sent, if the email exists in our system.</p>' : '') . '
                 '. (isset($_GET['invalidToken']) ? '<p class="infoMessage">This token is expired or invalid.</p>' : '' ). '
                 '. (isset($_GET['resetSuccess']) ? '<p class="infoMessage">Password was successfully changed!</p>' : '' ). '
             </form>';

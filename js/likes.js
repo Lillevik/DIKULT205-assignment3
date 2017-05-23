@@ -76,20 +76,6 @@ function like_post(element, id) {
     }
 }
 
-/*
- var id = this.className.split(/\s+/)[0];
- var element = this;
- if(likes_window !== null){
- likes_window = $('div');
- likes_window.attr('id', 'likes-window')
- }else{
- likes_window = $('div');
- likes_window.attr('id', 'likes-window')
- }
- var likes_window = $('#likes-window');
- */
-
-
 $(document).ready(function () {
     $(".display_likes").hover(function() {
         var likes_container = $($(this).find('.user_likes')[0]);
@@ -99,6 +85,7 @@ $(document).ready(function () {
         likes_window.empty();
 
         if(likes_container.html() === ""){
+            likes_container.html('loading...');
             $.ajax({
                 'type': 'get',
                 'url': domain + '/api/posts/get_likes.php?post=' + id,
@@ -106,13 +93,16 @@ $(document).ready(function () {
                     if(data.usernames.length > 0){
                         var names_list = $('<ul></ul>');
                         names_list.addClass('tooltiptext');
+                        likes_container.html('');
                         for(var i = 0;i < data.usernames.length;i++){
                             var name_element = $('<li></li>');
                             name_element.addClass('username');
                             name_element.html(data.usernames[i]);
                             likes_container.append(name_element);
                         }
+
                     }else{
+                        likes_container.html('');
                         likes_container.append("<li>No likes.</li>")
                     }
 

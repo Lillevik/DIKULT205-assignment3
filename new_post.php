@@ -147,6 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
         </header>
         <main>
             <form action="new_post.php" method="POST" enctype="multipart/form-data" id="post-form">
+                <h1 class="form-title">New Post</h1>
                 <?php
                 if(isset($err_arr)){
                     foreach($err_arr as $msg){
