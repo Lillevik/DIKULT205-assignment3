@@ -60,10 +60,10 @@ $url = $post['post_key'] . $post['extension'];
                 <?php echo_post_tags($post['id']) ?>
             </section>
             <section id="react-section">
-                <i id="<?php echo $post['id']?>" class="like-icon fa fa-heart<?php echo (isset($post['liked']) ? '' : '-o') ?>" aria-hidden="true" onclick="like_post(this)">
+                <i id="<?php echo $post['id']?>" class="like-icon fa fa-heart<?php echo (isset($post['liked']) ? '' : '-o') ?>" aria-hidden="true" onclick="like_post(this,<?php echo $post['id'] ?>)">
                     <p class="count-p"><span id="likes_count_<?php echo $post['id'] ?>"><?php echo $post['likes'] ?></span> <span id="likes_window" class="<?php echo $post['id'] ?>"></span>likes</p>
                 </i>
-                <i id="<?php echo $post['id']?>" class="favo-icon fa fa-star<?php echo (isset($post['is_favourite']) ? '' : '-o') ?> icon" aria-hidden="true" onclick="favourite_post(this)">
+                <i id="<?php echo $post['id']?>" class="favo-icon fa fa-star<?php echo (isset($post['is_favourite']) ? '' : '-o') ?> icon" aria-hidden="true" onclick="favourite_post(this,<?php echo $post['id'] ?>)">
                     <p class="count-p"><span id="favourite_count_<?php echo $post['id'] ?>"><?php echo $post['favourites']?></span> favorites</p>
                 </i>
             </section>

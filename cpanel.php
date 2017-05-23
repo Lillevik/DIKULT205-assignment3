@@ -5,7 +5,14 @@
  * Date: 10/05/2017
  * Time: 16:12
  */
+
 include 'functions.php';
+session_start();
+$rank = (isset($_SESSION['rank']) ? $_SESSION['rank'] : '');
+if($rank != 'admin'){
+    echo 'You are not authorized to view this page.';
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
