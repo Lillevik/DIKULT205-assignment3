@@ -1,3 +1,5 @@
+/* This file styles the navigation and is used on all pages */
+
 html{
     overflow: auto;
 }
@@ -261,6 +263,7 @@ label[for="submit-search"]{
     padding:4px;
 }
 
+/* Media query when window hits 500px */
 @media(max-width: 500px){
     body{
         margin-top: 68px;

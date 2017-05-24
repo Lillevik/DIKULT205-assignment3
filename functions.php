@@ -206,7 +206,13 @@ function echo_comment_tree($comments){
     }
 }
 
-
+/**
+ * Adds line indenting to
+ * make the code pretty.
+ * @param $input
+ * @param $indent
+ * @return string
+ */
 function add_line_indents($input, $indent){
     $output = "";
     $lines = explode("\n",$input);

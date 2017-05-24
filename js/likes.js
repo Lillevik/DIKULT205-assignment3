@@ -1,5 +1,9 @@
 /**
  * Created by goat on 18/01/17.
+ * This file handles the ajax requests to
+ * insert new likes into the database
+ * or deleting existing ones,
+ * using the post api.
  */
 
 

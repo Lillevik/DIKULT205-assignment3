@@ -1,3 +1,8 @@
+/*
+    This file handles the scroll events for the index page
+    and displaying/hiding not safe for work posts.
+ */
+
 var fixed = false;
 
 //Change the controls on scroll

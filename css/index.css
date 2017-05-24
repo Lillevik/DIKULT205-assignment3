@@ -1,3 +1,9 @@
+/*
+    This file styles the index page
+    and some of the main content.
+ */
+
+/* The main container */
 main{
     margin: 0 auto;
     width: 1100px;
@@ -17,6 +23,7 @@ main{
     display: inline-block;
 }
 
+/* The container for controls(favourites, categories) */
 #right-container{
     padding:5px;
     width: 300px;
@@ -56,6 +63,7 @@ main{
     margin:0 auto;
     overflow: hidden;
 }
+
 .post-image{
     max-width: 100%;
     display: block;
@@ -63,7 +71,7 @@ main{
 }
 
 .nsfw{
-    /* Cross browser blur */
+    /* Cross browser "blur" */
     transform: matrix3d(1, 0, 0, 0,
     0, 1, 0, 0,
     0, 0, 1, 0,
@@ -71,6 +79,7 @@ main{
     background-size: 0 0;
 }
 
+/* The container that holds each post */
 .post-wrapper{
     width: 500px;
     padding:10px;
@@ -87,17 +96,7 @@ a{
     overflow: auto;
 }
 
-.nsfw-viewer{
-    z-index: 10;
-    position: absolute;
-    top:40%;
-    left:40%;
-    border-radius:100%;
-    width: 100%;
-    height: 100%;
-
-}
-
+/* The button to toggle not safe for work posts*/
 .nsfw-button{
     display: block;
     width: 100%;
@@ -122,6 +121,7 @@ a{
     max-width: 100%;
 }
 
+/* Post titles */
 .post-title{
     font-size: 20px;
     width: 450px;
@@ -247,6 +247,7 @@ a{
     display: inline-block;
 }
 
+/* The show likes window */
 .tooltip {
     position: relative;
     display: inline-block;
@@ -314,9 +315,10 @@ a{
 .right-list-item:hover{
     transform: scale(1.02);
     box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+    background:rgba(115,202,224,0.7);
 }
 
-
+/* Media query when the window hits 750px */
 @media (max-width: 750px){
     main{
         display: block;

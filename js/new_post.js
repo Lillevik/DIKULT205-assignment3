@@ -1,3 +1,8 @@
+/**
+ * This function reads an image file that the users
+ * selects and then displays it in the preview area.
+ * @param input
+ */
 function readURL(input) {
     if (input.files && input.files[0]) {
         var reader = new FileReader();
@@ -12,6 +17,12 @@ function readURL(input) {
     }
 }
 
+/**
+ * This function adds a limit for how many checkboxes can be
+ * checked and alerts the user if the limit has been reached.
+ * @param checkgroup
+ * @param limit
+ */
 function checkboxlimit(checkgroup, limit){
     for (var i=0; i<checkgroup.length; i++){
         checkgroup[i].onclick=function(){
@@ -26,12 +37,22 @@ function checkboxlimit(checkgroup, limit){
     }
 }
 
-
+/**
+ * This function takes an inputfield and adds an event listener
+ * that displays the current length of the content each time something
+ * changes.
+ *
+ * @param field
+ * @param displayElement
+ * @param limit
+ */
 function display_current_input_length(field, displayElement, limit){
     field.addEventListener('input', function(){
         displayElement.innerHTML = parseInt(this.value.length);
     })
 }
+
+//The onload function that runs when the window loads
 window.onload = function(){
     checkboxlimit(document.getElementById('post-form'), 5);
 

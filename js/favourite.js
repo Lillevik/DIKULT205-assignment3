@@ -1,6 +1,11 @@
 /**
  * Created by goat on 11/04/2017.
+ * This file handles the ajax requests to
+ * insert new favourites into the database
+ * or deleting existing ones,
+ * using the post api.
  */
+
 
 var workingOnFavourite = false;
 function favourite_post(element, id) {

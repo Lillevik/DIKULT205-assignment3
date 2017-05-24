@@ -41,6 +41,9 @@ function resize_image_width($temp, $target_dir, $resized_name, $maxWidth, $minWi
 }
 
 /**
+ * This function resisizes and crops images used
+ * for the avatar page.
+ *
  * @param $max_width
  * @param $max_height
  * @param $source_file

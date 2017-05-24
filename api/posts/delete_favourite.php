@@ -1,5 +1,9 @@
 <?php
 
+/*
+ * This file handles deleting of user favourites.
+ */
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     session_start();
     if(isset($_SESSION['logged_in'])){

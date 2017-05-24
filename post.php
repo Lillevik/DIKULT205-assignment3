@@ -75,6 +75,7 @@ $url = $post['post_key'] . $post['extension'];
 
             <ul id="comments-list">
                 <?php
+                    //If there are comments, echo them
                     if($comments){
                         echo_comment_tree($comments);
                     }

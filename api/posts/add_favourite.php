@@ -1,5 +1,9 @@
 <?php
 
+/*
+ * This file handles inserting of new favourites
+ */
+
 //If the request method is post, echo json
 if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     session_start();

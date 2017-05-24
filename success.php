@@ -1,4 +1,5 @@
 <?php
+//A landing page after deleting posts.
 include 'functions.php';
 ?>
 <!DOCTYPE html>

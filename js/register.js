@@ -1,5 +1,8 @@
 /**
  * Created by goat on 28/02/2017.
+ * This file handles form validation of
+ * the register.php file using eventlisteners
+ * on all the inputfields.
  */
 
 var emailField = document.getElementById('emailinput');

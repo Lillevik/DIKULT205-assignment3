@@ -1,32 +1,13 @@
 /**
- * This file handles...
+ * This file handles the post.php page, which means
+ * all the comment appending to the parents.
  */
 
-var currentShown = null;
-const params = get_url_parameters();
-var working = false;
-
-
-function get_url_parameters() {
-    result = {};
-
-    var uri = document.location.href;
-
-    if (uri.indexOf("?") < 0)
-        return result;
-    query_string = uri.substring(uri.indexOf("?"));
-    if (query_string.indexOf("#") >= 0)
-        query_string = query_string.substring(0, query_string.indexOf("#"));
-
-
-    query_pattern = /(?:[?&])([^&=]+)(?:=)([^&]*)/g;
-    decode = function(str) {return decodeURIComponent(str.replace(/\+/g, " "));};
-    while(match = query_pattern.exec(query_string))
-        result[decode(match[1])] = decode(match[2]);
-    return result;
-}
-
-
+/**
+ * This function displays a new textarea when the user
+ * clicks on a reply button for a child comment.
+ * @param id
+ */
 function show_input(id){
     if(currentShown != null){
         currentShown.remove();
@@ -62,7 +43,10 @@ function show_input(id){
     field.focus();
 }
 
-
+/*
+    This is the onload function which adds evenet listeners to
+    show inputs for each reply button.
+ */
 window.onload = function(){
 
     const form = document.getElementById('comment-form');
@@ -85,7 +69,14 @@ window.onload = function(){
 };
 
 
-
+/**
+ * This function creates and appends a new comment element to the comment
+ * tree if the comments is successfully added the the database.
+ * @param text
+ * @param parent_element
+ * @param field
+ * @param p_key
+ */
 function add_comment(text, parent_element, field, p_key){
     var root = true;
     var parent_id = null;

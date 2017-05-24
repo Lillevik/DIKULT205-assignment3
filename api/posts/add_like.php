@@ -1,5 +1,9 @@
 <?php
 
+/*
+ * This file handles inserting of new likes.
+ */
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     session_start();
     $post_id = $_POST['data'];

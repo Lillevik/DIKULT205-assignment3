@@ -6,6 +6,10 @@
  * Time: 19:58
  */
 
+/*
+ * This file gets all the users who have likes a post and
+ * returns them in json format.
+ */
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET'){
     session_start();
