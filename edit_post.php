@@ -34,21 +34,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         }
     }
 }else if($_SERVER['REQUEST_METHOD'] == 'POST'){
+    //Declare array for holding errors
+    $editErrors = false;
+
     //Get the raw post contents
     $raw_title = (isset($_POST['title']) ? $_POST['title'] : '');
     $raw_description = (isset($_POST['description']) ? $_POST['description'] : '');
 
-    //Remove script tags and add newline
+    //Sanitize the user data
     $title = strip_tags($raw_title);
     $description = strip_tags($raw_description);
+
+    $titleError = null;
+    $tagError = null;
 
 
     $nsfw = (isset($_POST['nsfw']) ? true : false);
     $post_id_or_key = (isset($_GET['post']) ? $_GET['post'] : null);
-    $tags = $_POST['tags'];
-    update_post($title, $description, $post_id_or_key, $tags, $nsfw);
-    header('Location: edit_post.php?post=' . $post_id_or_key . "&success=true");
-    exit();
+    $tags = (isset($_POST['tags']) ? $_POST['tags']: Array());
+
+    if(strlen($title) < 2){
+        $titleError = true;
+        $editErrors = true;
+    }
+    if(count($tags) < 1){
+        $tagsError = true;
+        $editErrors = true;
+    }
+
+    if($editErrors){
+        header('Location: edit_post.php?post=' . $post_id_or_key . (isset($titleError)?"&titleErr=err":"") . (isset($tagsError)?"&tagsErr=err":""));
+        exit();
+    }else{
+        update_post($title, $description, $post_id_or_key, $tags, $nsfw);
+        header('Location: edit_post.php?post=' . $post_id_or_key . "&success=true");
+        exit();
+    }
 }
 
 ?>
@@ -80,6 +101,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
             }else if($editSuccess){
                 echo '<p>Edit was successful.</p>';
                 echo '<p>Permalink: <a href="./post.php?key='.$post_array['post_key'].'">here</a></p>';
+            }else if(isset($_GET['titleErr']) or isset($_GET['tagsErr'])){
+                echo (isset($_GET['titleErr']) ? "<p class='error-message'>Title must be longer than 2 characters.</p>":null);
+                echo (isset($_GET['tagsErr']) ? "<p class='error-message'>Post must have atleast 1 tag.</p>":null);
             }
             ?>
 

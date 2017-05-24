@@ -8,8 +8,11 @@ function favourite_post(element, id) {
     //Check if another process is already running
     if(!workingOnFavourite){
 
-        //Localhost
+        //Localhost or server
         var host_url = domain + "/api/posts/";
+
+        var favouriteCount = $('#favourite_count_' + id);
+
 
 
 
@@ -22,6 +25,7 @@ function favourite_post(element, id) {
 
                     workingOnFavourite = false;
                     if(data === 'Success'){
+                        favouriteCount.text(parseInt(favouriteCount.text()) +1);
                         element.classList.remove('fa-star-o');
                         element.classList.add('fa-star');
                     }else if(data === 'Access denied'){
@@ -40,6 +44,7 @@ function favourite_post(element, id) {
                 success: function(data){
                     workingOnFavourite = false;
                     if(data === 'Success'){
+                        favouriteCount.text(parseInt(favouriteCount.text()) - 1);
                         element.classList.remove('fa-star');
                         element.classList.add('fa-star-o');
                     }else if(data === 'Access denied'){

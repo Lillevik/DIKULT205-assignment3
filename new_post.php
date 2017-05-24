@@ -46,52 +46,56 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 
     if(!count($err_arr)) {
 
-
-        $target_dir = "uploadsfolder/";
-        $target_file = $target_dir . basename($_FILES["file-upload"]['name']);
-        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-        $filestring = random_string(6);
-        $filename = $filestring . "." . $imageFileType;
-        $cropped_name = $filestring . "c." . $imageFileType;
-        $uploadOk = 1;
-
-
-        $fileContent = exif_imagetype(($_FILES["file-upload"]["tmp_name"]));
-
-        if($fileContent == IMAGETYPE_GIF or $fileContent == IMAGETYPE_JPEG or $fileContent == IMAGETYPE_PNG){
-            $image = true;
+        if(!empty($_FILES["file-upload"]["tmp_name"])) {
+            $target_dir = "uploadsfolder/";
+            $target_file = $target_dir . basename($_FILES["file-upload"]['name']);
+            $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+            $filestring = random_string(6);
+            $filename = $filestring . "." . $imageFileType;
+            $cropped_name = $filestring . "c." . $imageFileType;
             $uploadOk = 1;
-        } else {
-            array_push($err_arr, "File is not an image.");
-            $uploadOk = 0;
-        }
 
 
-        // Check file size
-        if ($_FILES["file-upload"]["size"] > 6291456) {
-            array_push($err_arr, "Sorry, your file is too large. Max filesize is 6 megabytes.");
-            $uploadOk = 0;
-        }
+            $fileContent = exif_imagetype(($_FILES["file-upload"]["tmp_name"]));
 
-        // Allow certain file formats
-        if (strtolower($imageFileType) != "jpg" && strtolower($imageFileType) != "png" && strtolower($imageFileType) != "jpeg"
-            && strtolower($imageFileType) != "gif" && $image = true
-        ) {
-            array_push($err_arr, "Sorry, only JPG, JPEG, PNG & GIF files are allowed. Your file is of .$imageFileType filetype.");
-            $uploadOk = 0;
-        }
+            if ($fileContent == IMAGETYPE_GIF or $fileContent == IMAGETYPE_JPEG or $fileContent == IMAGETYPE_PNG) {
+                $image = true;
+                $uploadOk = 1;
+            } else {
+                array_push($err_arr, "File is not an image.");
+                $uploadOk = 0;
+            }
 
-        // Check if file already exists
-        if (file_exists($target_dir . $filename)) {
-            $finished = false;
-            while (!$finished) {
-                $filename = random_string(6) . "." . strtolower($imageFileType);
-                if (!file_exists($target_dir . $filename)) {
-                    $finished = true;
+
+            // Check file size
+            if ($_FILES["file-upload"]["size"] > 6291456) {
+                array_push($err_arr, "Sorry, your file is too large. Max filesize is 6 megabytes.");
+                $uploadOk = 0;
+            }
+
+            // Allow certain file formats
+            if (strtolower($imageFileType) != "jpg" && strtolower($imageFileType) != "png" && strtolower($imageFileType) != "jpeg"
+                && strtolower($imageFileType) != "gif" && $image = true
+            ) {
+                array_push($err_arr, "Sorry, only JPG, JPEG, PNG & GIF files are allowed. Your file is of .$imageFileType filetype.");
+                $uploadOk = 0;
+            }
+
+            // Check if file already exists
+            if (file_exists($target_dir . $filename)) {
+                $finished = false;
+                while (!$finished) {
+                    $filename = random_string(6) . "." . strtolower($imageFileType);
+                    if (!file_exists($target_dir . $filename)) {
+                        $finished = true;
+                    }
                 }
             }
-        }
-
+        }else{
+            $uploadOk = 0;
+            $err_arr[] = 'An imagefile is required.';
+            $err_msg = "";
+         }
         if($uploadOk != 0) {
             //Resize file
             $resize_ok = null;
